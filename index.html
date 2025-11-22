@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>agentkyle Interview Popup</title>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system; }
+
+    #launcher {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 58px;
+      height: 58px;
+      background: #2563eb;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      z-index: 9999;
+    }
+
+    #chatWindow {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      width: 360px;
+      height: 460px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+      display: none;
+      flex-direction: column;
+      z-index: 9999;
+    }
+
+    #header {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #body { flex: 1; padding: 10px; overflow-y: auto; background: #fafafa; }
+    .msg { margin-bottom: 10px; display: flex; }
+    .msg.user .bubble { margin-left: auto; background: #2563eb; color: white; padding: 8px 10px; border-radius: 12px; }
+    .msg.ai .bubble { background: white; border: 1px solid #ddd; padding: 8px 10px; border-radius: 12px; }
+
+    #inputArea { display: flex; border-top: 1px solid #eee; }
+    #input { flex: 1; border: none; padding: 8px; font-size: 14px; resize: none; height: 48px; }
+    #sendBtn { width: 80px; background: #2563eb; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div id="launcher">💬</div>
+
+<div id="chatWindow">
+  <div id="header">
+    Interview Assistant
+    <span id="closeBtn" style="cursor:pointer;">×</span>
+  </div>
+  <div id="body"></div>
+  <div id="inputArea">
+    <textarea id="input" placeholder="Ask something..."></textarea>
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<script>
+  // Your Render backend endpoint
+  const backendUrl = "https://agentkyle.onrender.com/api/interview";
+
+  const launcher = document.getElementById("launcher");
+  const chat = document.getElementById("chatWindow");
+  const closeBtn = document.getElementById("closeBtn");
+  const body = document.getElementById("body");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("sendBtn");
+
+  launcher.onclick = () => chat.style.display = "flex";
+  closeBtn.onclick = () => chat.style.display = "none";
+
+  function addMsg(type, text) {
+    const m = document.createElement("div");
+    m.className = "msg " + type;
+    const b = document.createElement("div");
+    b.className = "bubble";
+    b.textContent = text;
+    m.appendChild(b);
+    body.appendChild(m);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  addMsg("ai", "Hello, I'm your interview assistant. Ask me about the candidate's experience.");
+
+  async function sendMessage() {
+    const q = input.value.trim();
+    if (!q) return;
+
+    addMsg("user", q);
+    input.value = "";
+
+    addMsg("ai", "Typing...");
+
+    try {
+      const res = await fetch(backendUrl, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ question: q })
+      });
+      const data = await res.json();
+      const bubbles = body.querySelectorAll(".msg.ai .bubble");
+      bubbles[bubbles.length - 1].textContent = data.answer || "No response.";
+    } catch {
+      const bubbles = body.querySelectorAll(".msg.ai .bubble");
+      bubbles[bubbles.length - 1].textContent = "Error contacting server.";
+    }
+  }
+
+  sendBtn.onclick = sendMessage;
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+</script>
+
+</body>
+</html>
