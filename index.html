@@ -1,175 +1,159 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>You're chatting with Agent K...</title>
+<meta charset="UTF-8" />
+<title>Chat with Agent K</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Lato', sans-serif;
-    }
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+  }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      min-height: 100vh;
-      background: #f9fafb; /* nice neutral light gray behind transparent layers */
-      color: #111;
-      overflow: hidden;
-    }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: transparent; /* CRITICAL FOR GOOGLE SITES */
+    overflow: hidden;
+  }
 
-    .shell {
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: transparent; /* << TRANSPARENT */
-    }
+  /* Root wrapper – transparent */
+  .wrapper {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+  }
 
-    .header {
-      padding: 18px 24px;
-      border-bottom: 1px solid #e5e5e5;
-      background: transparent; /* << TRANSPARENT */
-      flex-shrink: 0;
-    }
+  .header {
+    padding: 12px 20px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111;
+    background: transparent;
+    border-bottom: 1px solid #e5e5e5;
+  }
 
-    .title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #111;
-    }
+  #chatBody {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-    #chatBody {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 24px;
-      overflow-y: auto;
-      gap: 16px;
-      background: transparent; /* << TRANSPARENT */
-    }
+  .msg-row {
+    display: flex;
+    animation: fadeIn 0.15s ease-out;
+  }
 
-    .msg-row {
-      display: flex;
-      animation: fadeIn 0.1s ease-out;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  .msg-user { justify-content: flex-end; }
+  .msg-bot  { justify-content: flex-start; }
 
-    .msg-user {
-      justify-content: flex-end;
-    }
+  .bubble {
+    max-width: 85%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 
-    .msg-bot {
-      justify-content: flex-start;
-    }
+  .bubble-user {
+    background: #1f2937; /* Dark gray bubble */
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
 
-    .bubble {
-      max-width: 90%;
-      padding: 14px 18px;
-      border-radius: 12px;
-      font-size: 15px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+  .bubble-bot {
+    background: #e5e7eb; /* Light gray bubble */
+    color: #111;
+    border-bottom-left-radius: 4px;
+  }
 
-    .bubble-user {
-      background: #1f2937; /* dark gray */
-      color: #ffffff;
-      border-bottom-right-radius: 4px;
-    }
+  /* Input bar pinned to bottom */
+  #inputBar {
+    background: transparent;
+    padding: 12px 20px 18px;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    gap: 12px;
+  }
 
-    .bubble-bot {
-      background: #e5e7eb; /* light neutral bubble */
-      color: #111;
-      border-bottom-left-radius: 4px;
-    }
+  #input {
+    flex: 1;
+    min-height: 48px;
+    max-height: 160px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #d1d5db;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    background: #ffffffd2; /* Slightly translucent to stay readable */
+  }
 
-    #inputBar {
-      display: flex;
-      gap: 12px;
-      padding: 20px 24px;
-      border-top: 1px solid #e5e5e5;
-      background: transparent; /* << TRANSPARENT */
-      backdrop-filter: blur(6px); /* subtle polish */
-      flex-shrink: 0;
-    }
+  #input:focus {
+    border-color: #1f2937;
+    box-shadow: 0 0 0 2px rgba(31,41,55,0.12);
+  }
 
-    #input {
-      flex: 1;
-      min-height: 48px;
-      max-height: 160px;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 1.5px solid #d1d5db;
-      font-size: 15px;
-      line-height: 1.5;
-      resize: none;
-      outline: none;
-      background: #ffffffa8; /* subtle translucency */
-    }
+  #sendBtn {
+    padding: 14px 22px;
+    height: 48px;
+    border-radius: 10px;
+    border: none;
+    background: #1f2937; /* Dark gray/black */
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
 
-    #input:focus {
-      border-color: #1f2937;
-      box-shadow: 0 0 0 2px rgba(31,41,55,0.12);
-    }
+  #sendBtn:hover {
+    background: #000;
+  }
 
-    #sendBtn {
-      padding: 14px 22px;
-      height: 48px;
-      border-radius: 10px;
-      border: none;
-      font-size: 15px;
-      font-weight: 700;
-      background: #1f2937;
-      color: #ffffff;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
+  #sendBtn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
 
-    #sendBtn:hover {
-      background: #000000;
-    }
+  #chatBody::-webkit-scrollbar {
+    width: 8px;
+  }
 
-    #sendBtn:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-
-    #chatBody::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #chatBody::-webkit-scrollbar-thumb {
-      background: #cfcfcf;
-      border-radius: 4px;
-    }
-  </style>
+  #chatBody::-webkit-scrollbar-thumb {
+    background: #d1d1d1;
+    border-radius: 4px;
+  }
+</style>
 </head>
 
 <body>
+<div class="wrapper">
 
-<div class="shell">
-
-  <div class="header">
-    <div class="title">Chat with Agent K</div>
-  </div>
+  <div class="header">Chat with Agent K</div>
 
   <div id="chatBody"></div>
 
   <div id="inputBar">
-    <textarea id="input" placeholder="Ask about Kyle's experience, STAR examples, strengths, or qualifications..."></textarea>
+    <textarea id="input" placeholder="Ask about Kyle’s experience, STAR stories, or qualifications..."></textarea>
     <button id="sendBtn">Send</button>
   </div>
-
 </div>
 
 <script>
@@ -207,7 +191,7 @@ async function send() {
     });
 
     if (!res.ok) {
-      addMsg("bot", "Backend is waking up... Try again.");
+      addMsg("bot", "Backend is waking up... Please retry.");
       sendBtn.disabled = false;
       return;
     }
@@ -215,8 +199,8 @@ async function send() {
     const data = await res.json();
     addMsg("bot", data.answer);
 
-  } catch (err) {
-    addMsg("bot", "Connection error. Please try again.");
+  } catch (e) {
+    addMsg("bot", "Network error. Try again.");
   }
 
   sendBtn.disabled = false;
@@ -237,7 +221,7 @@ input.addEventListener("input", () => {
   input.style.height = Math.min(input.scrollHeight, 160) + "px";
 });
 
-addMsg("bot", "Hi, I'm Agent K. Ask me anything about Kyle’s experience.");
+addMsg("bot", "Hi, I'm Agent K. What would you like to know about Kyle?");
 </script>
 
 </body>
