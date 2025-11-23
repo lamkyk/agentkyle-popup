@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Chat with AI Agent Kyle</title>
+  <title>Chat with Agent Kyle</title>
 
-  <!-- LATO FONT IMPORT -->
+  <!-- LATO FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght=300;400;700;900&display=swap" rel="stylesheet">
 
   <style>
@@ -12,7 +12,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background: transparent !important;
+      background: transparent;
       font-family: 'Lato', sans-serif;
       font-size: 14px;
       color: #333;
@@ -22,25 +22,24 @@
     }
 
     .shell {
-      width: min(420px, 100vw - 24px);
-      height: min(640px, 100vh - 40px);
+      width: min(420px, 100vw - 20px);
+      height: min(640px, 100vh - 20px);
       background: rgba(255,255,255,0.95);
       border-radius: 20px;
-      box-shadow: none !important;
+      border: 1px solid #eee;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      border: 1px solid #eaeaea;
     }
 
     .header {
-      padding: 14px 18px;
+      padding: 16px 18px;
       border-bottom: 1px solid #e6e6e6;
       background: transparent;
     }
 
     .title {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 900;
       color: #111;
     }
@@ -66,8 +65,8 @@
       padding: 12px 14px;
       border-radius: 14px;
       font-size: 14px;
-      line-height: 1.55;
       white-space: pre-wrap;
+      line-height: 1.55;
     }
 
     .bubble-user {
@@ -77,9 +76,9 @@
     }
 
     .bubble-bot {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #e6e6e6;
-      color: #333;
+      color: #111;
       border-bottom-left-radius: 6px;
     }
 
@@ -87,8 +86,8 @@
       display: flex;
       padding: 10px;
       border-top: 1px solid #e6e6e6;
-      background: transparent;
       gap: 8px;
+      align-items: flex-end;
     }
 
     #input {
@@ -113,6 +112,7 @@
       border: none;
       cursor: pointer;
     }
+
     #sendBtn:hover { background: #0063d6; }
   </style>
 </head>
@@ -121,89 +121,178 @@
 <div class="shell">
 
   <div class="header">
-    <div class="title">You're now chatting with Agent Kyle...</div>
+    <div class="title">Chat with Agent Kyle</div>
   </div>
 
   <div id="chatBody"></div>
 
   <div id="inputBar">
-    <textarea id="input" placeholder="Ask about Kyle's experience, strengths, or role fit..."></textarea>
+    <textarea id="input" placeholder="Ask about Kyle’s experience, roles, STAR examples, strengths, or job fit..."></textarea>
     <button id="sendBtn">Send</button>
   </div>
 </div>
 
 <script>
-const BACKEND = "https://agentkyle-backend.onrender.com/query";  // ← your backend
+/* ------------------------------------------------------
+   KNOWLEDGE BASE: Resume + Work Experience + STAR Stories
+---------------------------------------------------------*/
 
-// UI helpers
-function addMsg(type,text){
-  const row=document.createElement("div");
-  row.className="msg-row "+(type==="user"?"msg-user":"msg-bot");
-  const bubble=document.createElement("div");
-  bubble.className="bubble "+(type==="user"?"bubble-user":"bubble-bot");
-  bubble.textContent=text;
+const KB = {
+  profile: {
+    overview:
+      "Kyle Lam is a systems-minded operator with experience across autonomous vehicle testing, SaaS customer success, program management, and technical workflows. His background blends structured execution with cross-functional communication, making him effective in engineering-facing and customer-facing environments.",
+    strengths: [
+      "Structured testing and validation for complex systems",
+      "Cross-functional coordination with engineering, PM, and operations",
+      "Turning operational signals into clear insights and recommendations",
+      "Building workflows, SOPs, and repeatable processes",
+      "Enterprise customer management and stakeholder alignment"
+    ]
+  },
+
+  roles: [
+    {
+      id: "waymo_sse",
+      title: "Sr. Systems Engineering Test Conductor",
+      org: "Waymo",
+      keywords: ["waymo","av","sensor","testing","validation","autonomous"],
+      summary:
+        "Led structured AV sensor and behavior validation for next-generation releases. Partnered with perception, behavior, and hardware teams to design and execute test campaigns, ensuring safety and reliability ahead of ODD expansion.",
+      star: {
+        situation:
+          "Waymo was preparing multiple next-gen sensor and behavior updates, but lacked a structured method for validating reliability before advancing the ODD roadmap.",
+        task:
+          "Kyle was responsible for designing and operating test campaigns that would expose edge cases early and provide engineers confidence in readiness.",
+        action: [
+          "Created detailed test plans and execution workflows",
+          "Partnered with hardware, perception, and behavior teams",
+          "Authored SOPs to standardize operator execution",
+          "Built dashboards for throughput, coverage, and scenario tracking"
+        ],
+        result: [
+          "Unblocked several engineering releases",
+          "Improved milestone predictability",
+          "Accelerated pre-deployment validation cycles"
+        ]
+      }
+    },
+    {
+      id: "waymo_ops",
+      title: "Rider Operations / AV Instructor",
+      org: "Waymo",
+      keywords: ["rider","operations","ux","on-road","autonomous"],
+      summary:
+        "Executed real-world rider scenarios and captured UX, operational, and behavioral insights to shape readiness for scaled rider operations."
+    },
+    {
+      id: "narvar",
+      title: "Enterprise Customer Success Manager",
+      org: "Narvar",
+      keywords: ["saas","customer","enterprise","cs","retail"],
+      summary:
+        "Owned enterprise accounts for major retail brands. Ran QBRs, onboarding, and product configuration to deliver measurable value."
+    }
+  ]
+};
+
+/* ------------------------------------------------------
+   NATURAL RESPONSE ENGINE
+---------------------------------------------------------*/
+
+function naturalize(text) {
+  // Add light conversational flow
+  const openers = [
+    "Sure, here’s a clear breakdown:",
+    "Absolutely — here’s how to think about it:",
+    "Here’s a concise, natural explanation:",
+    "Let me walk through this in a clear way:",
+  ];
+  return openers[Math.floor(Math.random()*openers.length)] + "\n\n" + text;
+}
+
+function findRoleByKeywords(q) {
+  const lower = q.toLowerCase();
+  return KB.roles.find(r => r.keywords.some(k => lower.includes(k)));
+}
+
+function buildStar(role) {
+  let out = "";
+  out += "**Situation:** " + role.star.situation + "\n\n";
+  out += "**Task:** " + role.star.task + "\n\n";
+  out += "**Action:**\n" + role.star.action.map(a=>"• "+a).join("\n") + "\n\n";
+  out += "**Result:**\n" + role.star.result.map(r=>"• "+r).join("\n");
+  return out;
+}
+
+function buildAnswer(q) {
+  const lower = q.toLowerCase();
+
+  if (lower.includes("strength")) {
+    return naturalize(
+      "Kyle’s core strengths include:\n" +
+      KB.profile.strengths.map(s=>"• "+s).join("\n")
+    );
+  }
+
+  const role = findRoleByKeywords(q);
+  if (role) {
+    if (lower.includes("star")) {
+      return naturalize(buildStar(role));
+    }
+    return naturalize(role.summary);
+  }
+
+  if (lower.includes("tell me about yourself")) {
+    return naturalize(
+      "Kyle blends AV systems testing, SaaS customer success, and structured program execution. He’s operated at the intersection of engineering, operations, and customer experience — building reliable workflows, shaping test programs, and driving partner outcomes."
+    );
+  }
+
+  return naturalize(
+    "Here’s a quick overview of Kyle:\n\n" +
+    KB.profile.overview + "\n\n" +
+    "Strengths:\n" + KB.profile.strengths.map(s=>"• "+s).join("\n")
+  );
+}
+
+/* ------------------------------------------------------
+   UI & Messaging
+---------------------------------------------------------*/
+
+const chatBody = document.getElementById("chatBody");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+
+function addMsg(type, text) {
+  const row = document.createElement("div");
+  row.className = "msg-row " + (type==="user"?"msg-user":"msg-bot");
+  const bubble = document.createElement("div");
+  bubble.className = "bubble " + (type==="user"?"bubble-user":"bubble-bot");
+  bubble.innerHTML = text;
   row.appendChild(bubble);
   chatBody.appendChild(row);
-  chatBody.scrollTop=chatBody.scrollHeight;
+  chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-function addMeta(t){
-  const m=document.createElement("div");
-  m.style.fontSize="12px";
-  m.style.color="#888";
-  m.style.margin="6px 0";
-  m.textContent=t;
-  chatBody.appendChild(m);
-  chatBody.scrollTop=chatBody.scrollHeight;
-}
-
-// SEND MESSAGE → BACKEND
-async function sendMessage(q){
-  try {
-    const res = await fetch(BACKEND, {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({ query: q })
-    });
-
-    if (!res.ok) throw new Error("Backend error");
-
-    const data = await res.json();
-    return data.answer || "No response.";
-  }
-  catch (e){
-    return "Backend is waking up or unreachable. Try again in 10–20 seconds.";
-  }
-}
-
-// UI logic
-const chatBody=document.getElementById("chatBody");
-const input=document.getElementById("input");
-const sendBtn=document.getElementById("sendBtn");
-
-async function send(){
-  const q=input.value.trim();
-  if(!q) return;
-
+function send() {
+  const q = input.value.trim();
+  if (!q) return;
   addMsg("user", q);
-  input.value="";
-
-  const reply = await sendMessage(q);
-  addMsg("bot", reply);
+  input.value = "";
+  const ans = buildAnswer(q);
+  addMsg("bot", ans);
 }
 
-sendBtn.onclick=send;
-input.addEventListener("keydown", e=>{
-  if(e.key==="Enter" && !e.shiftKey){
+sendBtn.onclick = send;
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     send();
   }
 });
 
-// Initial welcome
-addMsg("bot","Hi, I’m Agent Kyle. Ask me anything about Kyle’s background, experience, job fit, or achievements.");
-addMeta("Try asking: “Give me Kyle’s STAR story for Waymo testing work.” or “Summarize his strengths for a TPM role.”");
-
+addMsg("bot", "Hi, I’m Agent Kyle. Ask me anything about Kyle’s experience, STAR stories, strengths, or how he fits a role.");
 </script>
 
 </body>
