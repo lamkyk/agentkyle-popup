@@ -2,518 +2,414 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>agentkyle – Interview Assistant (Local)</title>
+  <title>Chat with AI Agent Kyle</title>
+
+  <!-- LATO FONT IMPORT -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght=300;400;700;900&display=swap" rel="stylesheet">
+
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: transparent;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    /* Container so everything stays inside the iframe */
-    #root {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-width: 360px;
-      min-height: 460px;
-      overflow: hidden;
-    }
-
-    /* Floating launcher */
-    #launcher {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      border-radius: 999px;
-      background: #2563eb;
-      color: #fff;
+      background: #f7f7f7;
+      font-family: 'Lato', sans-serif;
+      font-size: 12px;
+      color: #333;
       display: flex;
-      align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-      cursor: pointer;
-      z-index: 9999;
-      border: none;
+      align-items: center;
     }
 
-    #launcher-label {
-      position: absolute;
-      top: -18px;
-      right: 0;
-      background: #111827;
-      color: #f9fafb;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
-    /* Chat window (360 x 460, medium size) */
-    #chatWindow {
-      position: fixed;
-      bottom: 88px;
-      right: 20px;
-      width: 360px;
-      max-width: calc(100vw - 24px);
-      height: 460px;
-      max-height: calc(100vh - 120px);
+    /* Chat Shell (Apple Card Style) */
+    .shell {
+      width: min(420px, 100vw - 24px);
+      height: min(640px, 100vh - 40px);
       background: #ffffff;
-      border-radius: 14px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 10px 30px rgba(15,23,42,0.28);
-      display: none;
+      border-radius: 26px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+      display: flex;
       flex-direction: column;
       overflow: hidden;
-      z-index: 9999;
     }
 
-    #header {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e5e7eb;
-      background: #f9fafb;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
+    /* Header */
+    .header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #e6e6e6;
+      background: #fafafa;
     }
 
-    #header-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: #111827;
+    .title {
+      font-size: 15px;
+      font-weight: 900; /* Lato Black */
+      color: #111;
     }
 
-    #header-sub {
-      font-size: 11px;
-      color: #6b7280;
-      margin-top: 2px;
+    .subtitle {
+      margin-top: 3px;
+      font-size: 12px;
+      color: #666;
     }
 
-    #closeBtn {
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      padding: 0 4px;
-      color: #6b7280;
-    }
-
-    #body {
+    /* Chat Body */
+    #chatBody {
       flex: 1;
-      padding: 10px;
-      background: #f3f4f6;
+      padding: 12px 16px;
       overflow-y: auto;
-      font-size: 13px;
+      background: #f2f2f7;
     }
 
-    .msg {
-      margin-bottom: 10px;
+    .msg-row {
       display: flex;
+      margin-bottom: 10px;
     }
 
-    .msg.user {
+    .msg-user {
       justify-content: flex-end;
     }
 
-    .msg.ai {
+    .msg-bot {
       justify-content: flex-start;
     }
 
     .bubble {
-      max-width: 80%;
-      padding: 8px 10px;
-      border-radius: 12px;
+      max-width: 78%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-size: 12px;
       white-space: pre-wrap;
       line-height: 1.45;
     }
 
-    .msg.user .bubble {
-      background: #2563eb;
-      color: #ffffff;
-      border-bottom-right-radius: 3px;
+    .bubble-user {
+      background: #dbe7ff;
+      color: #111;
+      border-bottom-right-radius: 6px;
     }
 
-    .msg.ai .bubble {
+    .bubble-bot {
       background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-bottom-left-radius: 3px;
-      color: #111827;
+      border: 1px solid #e6e6e6;
+      color: #333;
+      border-bottom-left-radius: 6px;
     }
 
     .meta {
-      font-size: 10px;
-      color: #6b7280;
+      font-size: 11px;
+      color: #888;
       margin-bottom: 6px;
+      text-align: left;
     }
 
-    #inputArea {
+    /* Input Area */
+    #inputBar {
       display: flex;
-      border-top: 1px solid #e5e7eb;
-      background: #ffffff;
+      padding: 10px;
+      border-top: 1px solid #e6e6e6;
+      background: #fff;
+      gap: 8px;
+      align-items: flex-end;
     }
 
     #input {
       flex: 1;
-      border: none;
-      padding: 8px;
-      font-size: 13px;
-      resize: none;
-      height: 52px;
+      height: auto;
+      min-height: 36px;
+      max-height: 80px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-family: 'Lato', sans-serif;
       outline: none;
-      font-family: inherit;
-      color: #111827;
+      resize: none;
     }
 
     #sendBtn {
-      width: 82px;
-      background: #2563eb;
-      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: #007aff;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
       border: none;
       cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
     }
 
-    #sendBtn:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-
-    #suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .chip {
-      border-radius: 999px;
-      border: 1px solid #e5e7eb;
-      padding: 3px 7px;
-      font-size: 11px;
-      background: #f9fafb;
-      cursor: pointer;
-      color: #374151;
-    }
-
-    .chip:hover {
-      background: #e5e7eb;
+    #sendBtn:hover {
+      background: #0063d6;
     }
 
     @media (max-width: 480px) {
-      #chatWindow {
-        right: 8px;
-        bottom: 80px;
-        width: calc(100vw - 16px);
-        height: 70vh;
-      }
-
-      #launcher {
-        bottom: 16px;
-        right: 16px;
+      .shell {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
       }
     }
   </style>
 </head>
-<body>
-<div id="root">
-  <button id="launcher" aria-label="Open interview assistant">
-    <div id="launcher-label">Chat with AI Agent Kyle</div>
-    💬
-  </button>
 
-  <div id="chatWindow">
-    <div id="header">
-      <div>
-        <div id="header-title">Interview assistant for Kyle Lam</div>
-        <div id="header-sub">
-          Answers based only on Kyle’s resume. No external AI or APIs.
-        </div>
-      </div>
-      <div id="closeBtn" title="Close">×</div>
-    </div>
-    <div id="body"></div>
-    <div id="inputArea">
-      <textarea id="input"
-        placeholder="Ask about experience at Waymo, customer success, skills, or how Kyle fits your role…"></textarea>
-      <button id="sendBtn">Send</button>
-    </div>
+<body>
+<div class="shell">
+  <!-- Header -->
+  <div class="header">
+    <div class="title">Chat with AI Agent Kyle</div>
+    <div class="subtitle">Interview-ready answers based only on Kyle Lam’s resume.</div>
+  </div>
+
+  <!-- Chat Body -->
+  <div id="chatBody"></div>
+
+  <!-- Input Bar -->
+  <div id="inputBar">
+    <textarea id="input" placeholder="Ask about Kyle's experience, strengths, or role fit..."></textarea>
+    <button id="sendBtn">Send</button>
   </div>
 </div>
 
+
 <script>
-  // -------------------------------------------------------------------
-  // Local resume "knowledge" – distilled from the PDF you uploaded.
-  // All answers are built from these pieces; no external calls.
-  // -------------------------------------------------------------------
+/* ------------------ Resume Knowledge Base ------------------ */
 
-  const summary = {
-    overview:
-      "Kyle is a systems-minded operator with 6+ years in SaaS, B2B2C customer success and account management, and several years in the autonomous vehicle space focused on systems engineering testing.",
-    strengths: [
-      "Designing and executing structured testing programs for complex systems, especially autonomous vehicles.",
-      "Partnering cross-functionally across engineering, ops, and vendor teams to ship and scale programs.",
-      "Translating noisy operational data into simple narratives, dashboards, and recommendations.",
-      "Owning enterprise customer relationships and renewals in SaaS and financial services contexts."
-    ]
-  };
+const summary = {
+  overview:
+    "Kyle Lam is a systems-minded operator with 6+ years in SaaS and B2B2C customer success and several years in the autonomous vehicle space focused on systems engineering testing.",
+  strengths: [
+    "Designing and executing structured testing programs for complex systems.",
+    "Partnering cross-functionally across engineering, ops, and vendor teams.",
+    "Turning operational data into clear narratives and recommendations.",
+    "Owning enterprise customer relationships and renewals in SaaS contexts."
+  ]
+};
 
-  const roles = [
-    {
-      id: "waymo_sse",
-      title: "Sr. Systems Engineering Test Conductor",
-      org: "Waymo (via staffing partner)",
-      location: "Mountain View, CA",
-      focus: "sensor and system validation for autonomous vehicles",
-      situation:
-        "Waymo needed reliable ways to validate next-generation sensors and AV behavior before expanding operational design domains and rider programs.",
-      task:
-        "Kyle owned the design and execution of structured test campaigns, plus analysis of data and results, to confirm that systems met performance and safety thresholds.",
-      actions: [
-        "Developed and ran end-to-end test plans for new sensors and behaviors, from scenario design to on-road or closed-course execution.",
-        "Collaborated with engineers, PMs, and vendors to define metrics, instrumentation, and acceptance criteria.",
-        "Built and maintained dashboards in tools like JIRA and internal data platforms to track progress, burndown, and capacity.",
-        "Supported training and playbooks so new test conductors and operators could execute complex procedures consistently."
-      ],
-      results: [
-        "Unblocked deployments by generating critical scenarios and evidence sets that supported ML model training and PR sign-off.",
-        "Improved test throughput and predictability by making work more visible and structured, which helped leadership plan headcount and milestones.",
-        "Raised the overall quality and repeatability of AV testing through better SOPs, tools, and feedback loops with engineering."
-      ],
-      keywords: ["waymo", "av", "autonomous", "sensor", "systems", "testing", "v&v", "validation", "safety"]
-    },
-    {
-      id: "waymo_ops",
-      title: "Autonomous Vehicle Instructor / Rider Operational Readiness",
-      org: "Waymo (via staffing agency)",
-      location: "Mountain View, CA",
-      focus: "operational readiness and rider experience",
-      situation:
-        "Waymo was preparing to scale rider operations and needed reliable on-road instructors and test operators to validate rider scenarios and operational workflows.",
-      task:
-        "Kyle’s responsibility was to safely operate AVs in complex environments while executing structured test cases and capturing high-quality operational feedback.",
-      actions: [
-        "Ran on-road and route-based scenarios that mirrored real rider journeys, logging behaviors, edge cases, and UX issues.",
-        "Partnered with rider support, dispatch, and UX teams to surface bugs and process gaps impacting trip quality.",
-        "Helped train and mentor cohorts of other operators on safety, procedures, and correct use of tools and logging."
-      ],
-      results: [
-        "Improved the fidelity of operational testing, which helped teams harden workflows before exposing more real riders.",
-        "Contributed to smoother handoffs between operations, rider support, and engineering by providing structured feedback."
-      ],
-      keywords: ["rider", "operations", "operational", "instructor", "on-road", "safety", "ux", "hailers"]
-    },
-    {
-      id: "narvar",
-      title: "Enterprise Customer Success Manager",
-      org: "Narvar",
-      location: "San Francisco, CA",
-      focus: "B2B2C post-purchase SaaS for enterprise retail",
-      situation:
-        "Narvar supported major retail brands looking to improve post-purchase experience and needed a CSM to own adoption, value, and renewals for key accounts.",
-      task:
-        "Kyle managed a portfolio of enterprise customers, aligning stakeholders, driving feature adoption, and ensuring measurable ROI so accounts renewed and expanded.",
-      actions: [
-        "Led onboarding and ongoing QBRs with senior stakeholders, focusing on outcomes like engagement, conversion, and support deflection.",
-        "Coordinated with product, solutions, and engineering to configure features such as notifications, tracking pages, and reporting.",
-        "Identified upsell opportunities and guided customers toward higher-value use cases when there was clear business fit."
-      ],
-      results: [
-        "Retained core accounts and protected revenue through strong relationships with senior decision-makers.",
-        "Helped migrate customers to improved platform capabilities without disrupting their live experiences."
-      ],
-      keywords: ["narvar", "saas", "customer success", "cs", "retail", "b2b2c", "post-purchase", "enterprise"]
-    },
-    {
-      id: "nasdaq",
-      title: "Service Account Manager",
-      org: "Nasdaq",
-      location: "San Francisco, CA",
-      focus: "corporate services for public companies",
-      situation:
-        "Nasdaq served a portfolio of listed companies that relied on its solutions for IR, communications, and regulatory support.",
-      task:
-        "Kyle owned relationships for a book of corporate clients, coordinating services, renewals, and upsell opportunities.",
-      actions: [
-        "Acted as a primary point of contact for  a large set of accounts, ensuring they understood and used Nasdaq’s services effectively.",
-        "Partnered with internal product, operations, and legal stakeholders to deliver on SLAs and address complex client needs.",
-        "Prepared and led business reviews that translated platform metrics and service activity into executive-level narratives."
-      ],
-      results: [
-        "Supported retention of recurring revenue across a diverse book of clients.",
-        "Generated incremental revenue through consultative upsells where there was clear value alignment."
-      ],
-      keywords: ["nasdaq", "account management", "service", "capital markets", "corporate", "public companies"]
-    }
-  ];
+const roles = [
+  {
+    id: "waymo_sse",
+    title: "Sr. Systems Engineering Test Conductor",
+    org: "Waymo",
+    location: "Mountain View, CA",
+    situation:
+      "Waymo needed reliable ways to validate next-generation sensors and AV behavior before expanding ODD and rider operations.",
+    task:
+      "Kyle designed and executed structured test campaigns to ensure systems met performance and safety thresholds.",
+    actions: [
+      "Developed and executed test plans for new sensors and behaviors.",
+      "Collaborated with engineers, PMs, and vendors to define metrics.",
+      "Created dashboards for forecasting, burndown, and capacity planning.",
+      "Authored SOPs and training materials for consistent testing execution."
+    ],
+    results: [
+      "Unblocked deployments through critical scenario generation.",
+      "Improved throughput and predictability of testing milestones.",
+      "Raised overall quality and consistency of AV testing programs."
+    ],
+    keywords: ["waymo", "sensor", "av", "autonomous", "system", "testing", "validation"]
+  },
 
-  const skills = [
-    "Testing & validation of complex systems (especially autonomous vehicles)",
-    "Program & project management, including planning, burndown tracking, and retrospectives",
-    "Customer success and account management for enterprise SaaS and corporate services",
-    "Stakeholder management across engineering, operations, vendors, and executives",
-    "Tooling familiarity with JIRA/JQL, basic SQL, HTML, dashboards and reporting tools",
-    "Working across Linux, macOS, and typical internal tools / CMS platforms"
-  ];
+  {
+    id: "waymo_ops",
+    title: "Autonomous Vehicle Instructor / Rider Operational Readiness",
+    org: "Waymo",
+    location: "Mountain View, CA",
+    situation:
+      "Waymo was preparing to scale rider operations and needed reliable operators to validate UX and operational workflows.",
+    task:
+      "Kyle executed structured on-road test cases while capturing high-quality UX and operations feedback.",
+    actions: [
+      "Ran real-world rider scenarios and logged behaviors and UX gaps.",
+      "Partnered with rider support, dispatch, and UX teams for insights.",
+      "Mentored operator cohorts on safety standards and structured testing."
+    ],
+    results: [
+      "Improved operational readiness ahead of rider program expansion.",
+      "Strengthened cross-team handoffs with structured feedback."
+    ],
+    keywords: ["rider", "operations", "instructor", "on-road", "ux"]
+  },
 
-  // -------------------------------------------------------------------
-  // Simple local STAR-style answer engine
-  // -------------------------------------------------------------------
+  {
+    id: "narvar",
+    title: "Enterprise Customer Success Manager",
+    org: "Narvar",
+    location: "San Francisco, CA",
+    situation:
+      "Major retail brands depended on Narvar for post-purchase experiences and needed a strong CS owner.",
+    task:
+      "Kyle managed enterprise accounts, driving adoption, alignment, and measurable ROI.",
+    actions: [
+      "Led onboarding and QBRs with senior stakeholders.",
+      "Coordinated with product/engineering on feature configuration.",
+      "Identified upsell opportunities tied to business value."
+    ],
+    results: [
+      "Retained core accounts and protected revenue.",
+      "Enabled seamless migrations to advanced platform capabilities."
+    ],
+    keywords: ["saas", "customer success", "retail", "enterprise"]
+  },
 
-  function tokensFrom(text) {
-    return (text || "")
-      .toLowerCase()
-      .split(/[^a-z0-9]+/)
-      .filter(Boolean);
+  {
+    id: "nasdaq",
+    title: "Service Account Manager",
+    org: "Nasdaq",
+    location: "San Francisco, CA",
+    situation:
+      "Nasdaq needed reliable account management for a diverse book of listed corporate clients.",
+    task:
+      "Kyle owned renewals, service coordination, and consultative relationship management.",
+    actions: [
+      "Acted as main point of contact for corporate accounts.",
+      "Led executive business reviews translating metrics to insights.",
+      "Partnered with product, operations, and legal to meet SLAs."
+    ],
+    results: [
+      "Supported retention of recurring revenue.",
+      "Generated incremental revenue through consultative upsells."
+    ],
+    keywords: ["nasdaq", "account", "corporate", "service", "capital markets"]
   }
+];
 
-  const STOPWORDS = new Set([
-    "the","and","for","with","that","this","from","into","about","have","has","had","been","over",
-    "more","than","role","what","does","did","you","your","his","her","their","how","many","years",
-    "tell","me","can","who","where","when","why","are","was","will","would","could","should",
-    "do","on","in","at","to","of","a","an","as","by","or","it","is","be","based","using"
-  ]);
+const skills = [
+  "Testing and validation of complex systems.",
+  "Program and project management.",
+  "SaaS customer success and enterprise account management.",
+  "Stakeholder management and cross-functional execution.",
+  "JIRA/JQL, SQL, HTML, dashboards and tooling.",
+  "Linux, macOS, and internal CMS systems."
+];
 
-  function keywordsFrom(question) {
-    return tokensFrom(question).filter(w => w.length > 2 && !STOPWORDS.has(w));
+/* ------------------ STAR ENGINE ------------------ */
+
+function tokenize(text) {
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+const STOP = new Set([
+  "the","and","for","with","that","this","from","into","about","have","has",
+  "had","been","more","than","role","what","does","did","you","your","his",
+  "her","their","how","many","years","tell","me","can","who","where","when",
+  "why","are","was","will","would","could","should","do","on","in","at","to",
+  "of","a","an","as","by","or","it","is","be","based","using"
+]);
+
+function extractKeywords(q) {
+  return tokenize(q).filter(w => w.length > 2 && !STOP.has(w));
+}
+
+function scoreRole(role, kw) {
+  const blob = (
+    role.title + " " +
+    role.org + " " +
+    role.situation + " " +
+    role.task + " " +
+    role.actions.join(" ") + " " +
+    role.results.join(" ")
+  ).toLowerCase();
+
+  let s = 0;
+  for (const k of kw) {
+    if (blob.includes(k)) s++;
+    if (role.keywords.includes(k)) s++;
   }
+  return s;
+}
 
-  function scoreRole(role, kws) {
-    const lowerFields = (
-      role.title + " " +
-      role.org + " " +
-      (role.focus || "") + " " +
-      (role.situation || "") + " " +
-      (role.task || "") + " " +
-      role.actions.join(" ") + " " +
-      role.results.join(" ")
-    ).toLowerCase();
+function buildAnswer(q) {
+  const kw = extractKeywords(q);
 
-    let score = 0;
-    for (const k of kws) {
-      if (lowerFields.includes(k)) score += 1;
-      if (role.keywords && role.keywords.includes(k)) score += 1;
-    }
-    return score;
-  }
-
-  function buildStarAnswer(question) {
-    const kws = keywordsFrom(question);
-
-    // If question is very generic, give overview
-    if (kws.length === 0 ||
-       kws.every(k => ["experience","background","summary","overview","kyle"].includes(k))) {
-      let res = "Here’s a concise overview of Kyle’s background:\n\n";
-      res += "• " + summary.overview + "\n\n";
-      res += "Key strengths:\n";
-      for (const s of summary.strengths) res += "• " + s + "\n";
-      return res;
-    }
-
-    // Try to match to roles
-    const scored = roles
-      .map(r => ({ role: r, score: scoreRole(r, kws) }))
-      .filter(x => x.score > 0)
-      .sort((a,b) => b.score - a.score);
-
-    if (scored.length === 0) {
-      // Fall back to skills
-      let res = "The resume doesn’t talk directly about that, but in general Kyle brings:\n\n";
-      for (const s of skills) res += "• " + s + "\n";
-      return res;
-    }
-
-    const best = scored[0].role;
-
-    let answer = "";
-    answer += best.title + " at " + best.org + " (" + best.location + ")\n\n";
-    answer += "Situation: " + best.situation + "\n\n";
-    answer += "Task: " + best.task + "\n\n";
-    answer += "Action:\n";
-    for (const a of best.actions) {
-      answer += "• " + a + "\n";
-    }
-    answer += "\nResult:\n";
-    for (const r of best.results) {
-      answer += "• " + r + "\n";
-    }
-
-    return answer;
-  }
-
-  // -------------------------------------------------------------------
-  // Chat UI behaviour
-  // -------------------------------------------------------------------
-
-  const launcher = document.getElementById("launcher");
-  const chat = document.getElementById("chatWindow");
-  const closeBtn = document.getElementById("closeBtn");
-  const body = document.getElementById("body");
-  const input = document.getElementById("input");
-  const sendBtn = document.getElementById("sendBtn");
-
-  launcher.addEventListener("click", () => {
-    chat.style.display = "flex";
-    launcher.style.display = "none";
-    input.focus();
-  });
-
-  closeBtn.addEventListener("click", () => {
-    chat.style.display = "none";
-    launcher.style.display = "flex";
-  });
-
-  function addMsg(type, text) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "msg " + type;
-    const bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.textContent = text;
-    wrapper.appendChild(bubble);
-    body.appendChild(wrapper);
-    body.scrollTop = body.scrollHeight;
-  }
-
-  function addMeta(text) {
-    const m = document.createElement("div");
-    m.className = "meta";
-    m.textContent = text;
-    body.appendChild(m);
-    body.scrollTop = body.scrollHeight;
-  }
-
-  function seedWelcome() {
-    addMsg(
-      "ai",
-      "Hi, I’m agentkyle – a local interview assistant. I answer questions using only Kyle Lam’s resume, so everything is grounded in his actual experience."
+  if (kw.length === 0) {
+    return (
+      "Here is a quick overview:\n\n" +
+      "• " + summary.overview + "\n\n" +
+      "Strengths:\n" +
+      summary.strengths.map(s => "• " + s).join("\n")
     );
-    addMeta("Try questions like: “What did Kyle do at Waymo?”, “How strong is his customer success background?”, or “How would he fit a systems PM role?”");
   }
 
-  async function handleSend() {
-    const q = (input.value || "").trim();
-    if (!q) return;
-    addMsg("user", q);
-    input.value = "";
+  const matches = roles
+    .map(r => ({ role: r, score: scoreRole(r, kw) }))
+    .filter(r => r.score > 0)
+    .sort((a,b) => b.score - a.score);
 
-    const answer = buildStarAnswer(q);
-    addMsg("ai", answer);
+  if (matches.length === 0) {
+    return (
+      "The resume does not directly mention that, but in general Kyle brings:\n\n" +
+      skills.map(s => "• " + s).join("\n")
+    );
   }
 
-  sendBtn.addEventListener("click", handleSend);
+  const best = matches[0].role;
 
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  });
+  return (
+    `${best.title} at ${best.org} (${best.location})\n\n` +
+    `Situation: ${best.situation}\n\n` +
+    `Task: ${best.task}\n\n` +
+    `Action:\n` +
+    best.actions.map(a => "• " + a).join("\n") +
+    `\n\nResult:\n` +
+    best.results.map(r => "• " + r).join("\n")
+  );
+}
 
-  seedWelcome();
+/* ------------------ Chat UI Logic ------------------ */
+
+const chatBody = document.getElementById("chatBody");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+
+function addMsg(type, text) {
+  const row = document.createElement("div");
+  row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble " + (type === "user" ? "bubble-user" : "bubble-bot");
+  bubble.textContent = text;
+
+  row.appendChild(bubble);
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function addMeta(text) {
+  const m = document.createElement("div");
+  m.className = "meta";
+  m.textContent = text;
+  chatBody.appendChild(m);
+}
+
+function send() {
+  const q = input.value.trim();
+  if (!q) return;
+
+  addMsg("user", q);
+  input.value = "";
+
+  const ans = buildAnswer(q);
+  addMsg("bot", ans);
+}
+
+sendBtn.onclick = send;
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+});
+
+function welcome() {
+  addMsg("bot", "Hi, I’m Agent Kyle. Ask me anything about Kyle’s experience—Waymo, Narvar, Nasdaq, systems testing, customer success, or how he fits a role.");
+  addMeta("Try: “What did Kyle do at Waymo?” or “Tell me about his strengths for a TPM role.”");
+}
+
+welcome();
 </script>
+
 </body>
 </html>
