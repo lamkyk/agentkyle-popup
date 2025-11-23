@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Chat with Agent K</title>
+<title>You're chatting with Agent K...</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
@@ -17,11 +17,10 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    background: transparent; /* CRITICAL FOR GOOGLE SITES */
+    background: transparent;
     overflow: hidden;
   }
 
-  /* Root wrapper – transparent */
   .wrapper {
     height: 100vh;
     width: 100%;
@@ -73,18 +72,17 @@
   }
 
   .bubble-user {
-    background: #1f2937; /* Dark gray bubble */
+    background: #1f2937;
     color: white;
     border-bottom-right-radius: 4px;
   }
 
   .bubble-bot {
-    background: #e5e7eb; /* Light gray bubble */
+    background: #e5e7eb;
     color: #111;
     border-bottom-left-radius: 4px;
   }
 
-  /* Input bar pinned to bottom */
   #inputBar {
     background: transparent;
     padding: 12px 20px 18px;
@@ -103,7 +101,7 @@
     font-size: 15px;
     resize: none;
     outline: none;
-    background: #ffffffd2; /* Slightly translucent to stay readable */
+    background: #ffffffd2;
   }
 
   #input:focus {
@@ -116,37 +114,25 @@
     height: 48px;
     border-radius: 10px;
     border: none;
-    background: #1f2937; /* Dark gray/black */
+    background: #1f2937;
     color: white;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
   }
 
-  #sendBtn:hover {
-    background: #000;
-  }
+  #sendBtn:hover { background: #000; }
+  #sendBtn:disabled { background: #9ca3af; cursor: not-allowed; }
 
-  #sendBtn:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-  }
-
-  #chatBody::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  #chatBody::-webkit-scrollbar-thumb {
-    background: #d1d1d1;
-    border-radius: 4px;
-  }
+  #chatBody::-webkit-scrollbar { width: 8px; }
+  #chatBody::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 4px; }
 </style>
 </head>
 
 <body>
 <div class="wrapper">
 
-  <div class="header">You're chatting with Agent K...</div>
+  <div class="header">You're chatting with Agent K…</div>
 
   <div id="chatBody"></div>
 
@@ -157,6 +143,8 @@
 </div>
 
 <script>
+const RESUME_URL = "https://drive.google.com/file/d/1u34EYqM1fC5Y68GKTxpKAtmR0xR0Qk7z/view?usp=sharing";
+
 const chatBody = document.getElementById("chatBody");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
@@ -187,7 +175,10 @@ async function send() {
     const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q })
+      body: JSON.stringify({
+        q,
+        resume: RESUME_URL
+      })
     });
 
     if (!res.ok) {
@@ -221,7 +212,10 @@ input.addEventListener("input", () => {
   input.style.height = Math.min(input.scrollHeight, 160) + "px";
 });
 
-addMsg("bot", "Hi, I'm Agent K. What would you like to know about Kyle?");
+// Updated intro message
+addMsg("bot",
+  "Hello, I'm Agent K — an AI assistant trained on Kyle’s background and technical experience. What would you like to know?"
+);
 </script>
 
 </body>
