@@ -14,296 +14,173 @@
       height: 100%;
       background: transparent !important;
       font-family: 'Lato', sans-serif;
-      font-size: 14px;
+      font-size: 15px;
       color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* Chat Shell */
     .shell {
       width: min(420px, 100vw - 24px);
       height: min(640px, 100vh - 40px);
-
-      /* background white but blending with page */
-      background: rgba(255, 255, 255, 0.95);
-
+      background: rgba(255, 255, 255, 0.90);
       border-radius: 20px;
-      box-shadow: none !important;   /* remove shadow */
+      border: 1px solid #eaeaea;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      border: 1px solid #eaeaea;     /* subtle frame to define edges */
     }
 
-    /* Header */
     .header {
       padding: 14px 18px;
       border-bottom: 1px solid #e6e6e6;
-      background: #fafafa00; /* transparent header */
+      background: transparent;
     }
 
     .title {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 900;
       color: #111;
     }
 
-    .subtitle {
-      margin-top: 4px;
-      font-size: 13px;
-      color: #666;
-    }
-
-    /* Chat Body */
     #chatBody {
       flex: 1;
-      padding: 14px 16px;
+      padding: 16px;
       overflow-y: auto;
       background: transparent;
-      font-size: 14px;
     }
 
     .msg-row {
       display: flex;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
-    .msg-user {
-      justify-content: flex-end;
-    }
-
-    .msg-bot {
-      justify-content: flex-start;
-    }
+    .msg-user { justify-content: flex-end; }
+    .msg-bot { justify-content: flex-start; }
 
     .bubble {
       max-width: 78%;
       padding: 12px 14px;
       border-radius: 14px;
-      font-size: 14px;
-      white-space: pre-wrap;
+      font-size: 15px;
       line-height: 1.55;
+      white-space: pre-wrap;
     }
 
     .bubble-user {
       background: #dbe7ff;
-      color: #111;
       border-bottom-right-radius: 6px;
     }
 
     .bubble-bot {
       background: #ffffff;
       border: 1px solid #e6e6e6;
-      color: #333;
       border-bottom-left-radius: 6px;
     }
 
-    .meta {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 6px;
-    }
-
-    /* Input Area */
     #inputBar {
       display: flex;
       padding: 10px;
       border-top: 1px solid #e6e6e6;
       background: transparent;
       gap: 8px;
-      align-items: flex-end;
     }
 
     #input {
       flex: 1;
-      min-height: 40px;
-      max-height: 100px;
+      min-height: 42px;
       border-radius: 8px;
       border: 1px solid #ddd;
-      padding: 8px 10px;
-      font-size: 14px;
+      padding: 10px;
+      font-size: 15px;
       resize: none;
-      font-family: 'Lato', sans-serif;
     }
 
     #sendBtn {
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 8px;
       background: #007aff;
       color: white;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
       border: none;
       cursor: pointer;
-    }
-
-    #sendBtn:hover {
-      background: #0063d6;
-    }
-
-    @media (max-width: 480px) {
-      .shell {
-        width: 100vw;
-        height: 100vh;
-        border-radius: 0;
-        border: none;
-      }
     }
   </style>
 </head>
 
 <body>
 <div class="shell">
-
-  <!-- Header -->
   <div class="header">
-    <div class="title">You're now chatting with Agent Kyle...</div>
+    <div class="title">You're now chatting with Agent Kyle</div>
   </div>
 
-  <!-- Chat Body -->
   <div id="chatBody"></div>
 
-  <!-- Input Bar -->
   <div id="inputBar">
-    <textarea id="input" placeholder="Ask about Kyle's experience, strengths, or role fit..."></textarea>
+    <textarea id="input" placeholder="Ask Kyle anything about his experience..."></textarea>
     <button id="sendBtn">Send</button>
   </div>
 </div>
 
 <script>
-/* ---------- RESUME KNOWLEDGE BASE (unchanged yet) ---------- */
-/* We will build the BIG KB after you confirm appearance. */
 
-const summary = {
-  overview:
-    "Kyle Lam is a systems-minded operator with 6+ years in SaaS, B2B2C customer success, and multiple years in autonomous vehicle systems testing.",
-  strengths: [
-    "Structured testing for complex systems.",
-    "Cross-functional execution with engineering and ops.",
-    "Turning operational data into insights.",
-    "Owning enterprise customer relationships."
-  ]
-};
+const API_URL = "https://agentkyle-backend.onrender.com/chat";
 
-/* Roles Array (shortened for now; we'll rebuild with full KB next) */
-const roles = [
-  {
-    id: "waymo_sse",
-    title: "Sr. Systems Engineering Test Conductor",
-    org: "Waymo",
-    location: "Mountain View, CA",
-    situation:
-      "Waymo needed reliable validation for next-generation sensors and AV behaviors.",
-    task:
-      "Kyle executed structured test campaigns ensuring systems met safety thresholds.",
-    actions: [
-      "Built and executed detailed test plans.",
-      "Collaborated with engineers and PMs.",
-      "Authored SOPs and training docs."
-    ],
-    results: [
-      "Unblocked deployments.",
-      "Improved predictability of milestones."
-    ],
-    keywords: ["waymo","sensor","testing","validation","av"]
-  }
-];
+function addMsg(type, text) {
+  const row = document.createElement("div");
+  row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
 
-const skills = [
-  "Systems testing.",
-  "Program management.",
-  "Customer success.",
-  "Cross-functional execution.",
-  "SQL, JQL, HTML.",
-  "Linux & macOS."
-];
+  const bubble = document.createElement("div");
+  bubble.className = "bubble " + (type === "user" ? "bubble-user" : "bubble-bot");
+  bubble.textContent = text;
 
-/* ---------- Answer Engine ---------- */
-function tokenize(t){return t.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);}
-const STOP=new Set(["the","and","for","with","that","this","from","into","about","have","has","what","why","who","how","are","you","his","her","their","did","does","can","role","fit","tell","me","ask","years"]);
-
-function extractKeywords(q){
-  return tokenize(q).filter(w => w.length > 2 && !STOP.has(w));
-}
-
-function scoreRole(role, words){
-  const blob=(role.title+" "+role.org+" "+role.situation+" "+role.task+" "+role.actions.join(" ")+role.results.join(" ")).toLowerCase();
-  let s=0;
-  for(const w of words){
-    if(blob.includes(w)) s++;
-    if(role.keywords.includes(w)) s++;
-  }
-  return s;
-}
-
-function buildAnswer(q){
-  const kw=extractKeywords(q);
-
-  if(kw.length===0){
-    return summary.overview + "\n\nStrengths:\n" + summary.strengths.map(s=>"• "+s).join("\n");
-  }
-
-  const matches = roles
-    .map(r=>({role:r,score:scoreRole(r,kw)}))
-    .filter(x=>x.score>0)
-    .sort((a,b)=>b.score-a.score);
-
-  if(matches.length===0){
-    return "Here’s what Kyle generally brings:\n\n" + skills.map(s=>"• "+s).join("\n");
-  }
-
-  const r = matches[0].role;
-
-  return `${r.title} at ${r.org} (${r.location})\n\nSituation: ${r.situation}\n\nTask: ${r.task}\n\nActions:\n${r.actions.map(a=>"• "+a).join("\n")}\n\nResults:\n${r.results.map(a=>"• "+a).join("\n")}`;
-}
-
-/* ---------- UI Logic ---------- */
-const chatBody=document.getElementById("chatBody");
-const input=document.getElementById("input");
-const sendBtn=document.getElementById("sendBtn");
-
-function addMsg(type,text){
-  const row=document.createElement("div");
-  row.className="msg-row "+(type==="user"?"msg-user":"msg-bot");
-  const bubble=document.createElement("div");
-  bubble.className="bubble "+(type==="user"?"bubble-user":"bubble-bot");
-  bubble.textContent=text;
   row.appendChild(bubble);
   chatBody.appendChild(row);
-  chatBody.scrollTop=chatBody.scrollHeight;
+  chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-function addMeta(t){
-  const m=document.createElement("div");
-  m.className="meta";
-  m.textContent=t;
-  chatBody.appendChild(m);
+async function callBackend(question) {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: question })
+    });
+
+    const data = await response.json();
+    return data.answer || "(No answer returned)";
+  } catch (err) {
+    return "Error contacting server.";
+  }
 }
 
-function send(){
-  const q=input.value.trim();
-  if(!q) return;
-  addMsg("user",q);
-  input.value="";
-  addMsg("bot",buildAnswer(q));
+async function send() {
+  const q = input.value.trim();
+  if (!q) return;
+
+  addMsg("user", q);
+  input.value = "";
+
+  addMsg("bot", "Thinking...");
+
+  const answer = await callBackend(q);
+
+  chatBody.lastChild.querySelector(".bubble-bot").textContent = answer;
 }
 
-sendBtn.onclick=send;
-input.addEventListener("keydown",e=>{
-  if(e.key==="Enter"&&!e.shiftKey){
+sendBtn.onclick = send;
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     send();
   }
 });
 
-function welcome(){
-  addMsg("bot","Hi, I’m Agent Kyle. Ask me anything about Kyle’s experience or how he fits a role.");
-  addMeta(`Try: “What did Kyle do in the autonomous driving industry?” or “Tell me about his strengths for a TPM role.”`);
-}
-welcome();
-</script>
+addMsg("bot", "Hi, I’m Agent Kyle. Ask me anything about Kyle’s background, roles, or strengths.");
 
+</script>
 </body>
 </html>
