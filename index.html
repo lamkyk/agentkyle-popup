@@ -20,12 +20,11 @@
     width: 100%;
     background: transparent;
     overflow: hidden;
-    -webkit-overflow-scrolling: touch;
   }
 
   .wrapper {
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile */
+    height: 100dvh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -33,7 +32,7 @@
   }
 
   .header {
-    padding: 16px 20px;
+    padding: 18px 20px;
     font-size: 18px;
     font-weight: 700;
     color: #111;
@@ -44,19 +43,20 @@
 
   #chatBody {
     flex: 1;
-    padding: 16px 20px;
+    padding: 20px;
     overflow-y: auto;
     overflow-x: hidden;
     background: transparent;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     -webkit-overflow-scrolling: touch;
   }
 
   .msg-row {
     display: flex;
-    animation: fadeIn 0.15s ease-out;
+    animation: fadeIn 0.2s ease-out;
+    width: 100%;
   }
 
   @keyframes fadeIn {
@@ -68,13 +68,15 @@
   .msg-bot  { justify-content: flex-start; }
 
   .bubble {
-    max-width: 85%;
-    padding: 12px 16px;
-    border-radius: 14px;
+    max-width: 100%;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .bubble-user {
@@ -84,44 +86,44 @@
   }
 
   .bubble-bot {
-    background: #e5e7eb;
-    color: #111;
+    background: #f3f4f6;
+    color: #1f2937;
     border-bottom-left-radius: 4px;
   }
 
   #inputBar {
     background: transparent;
-    padding: 12px 16px;
+    padding: 16px 20px 20px;
     border-top: 1px solid #e5e5e5;
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: flex-end;
     flex-shrink: 0;
   }
 
   #input {
     flex: 1;
-    min-height: 44px;
+    min-height: 48px;
     max-height: 120px;
-    padding: 12px 14px;
+    padding: 13px 16px;
     border-radius: 12px;
     border: 1.5px solid #d1d5db;
     font-size: 15px;
     resize: none;
     outline: none;
-    background: #ffffffd2;
-    line-height: 1.4;
+    background: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
   }
 
   #input:focus {
     border-color: #1f2937;
-    box-shadow: 0 0 0 2px rgba(31,41,55,0.12);
+    box-shadow: 0 0 0 3px rgba(31,41,55,0.08);
   }
 
   #sendBtn {
-    padding: 12px 20px;
-    height: 44px;
-    border-radius: 10px;
+    padding: 13px 24px;
+    height: 48px;
+    border-radius: 12px;
     border: none;
     background: #1f2937;
     color: white;
@@ -132,67 +134,77 @@
     transition: background 0.15s;
   }
 
-  #sendBtn:hover { background: #000; }
+  #sendBtn:hover { background: #111827; }
   #sendBtn:active { background: #000; }
   #sendBtn:disabled { background: #9ca3af; cursor: not-allowed; }
 
   #chatBody::-webkit-scrollbar { width: 6px; }
-  #chatBody::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 3px; }
+  #chatBody::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+  #chatBody::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
     .header {
-      padding: 14px 16px;
+      padding: 16px;
       font-size: 17px;
     }
 
     #chatBody {
-      padding: 12px 16px;
-      gap: 10px;
+      padding: 16px;
+      gap: 14px;
     }
 
     .bubble {
-      max-width: 90%;
-      padding: 11px 14px;
+      padding: 13px 15px;
       font-size: 15px;
+      max-width: 100%;
     }
 
     #inputBar {
-      padding: 10px 12px;
-      gap: 8px;
+      padding: 14px 16px 18px;
+      gap: 10px;
     }
 
     #input {
-      font-size: 16px; /* Prevents zoom on iOS */
-      padding: 11px 12px;
-      min-height: 42px;
+      font-size: 16px;
+      padding: 12px 14px;
+      min-height: 46px;
       max-height: 100px;
     }
 
     #sendBtn {
-      padding: 10px 16px;
-      height: 42px;
-      font-size: 14px;
+      padding: 12px 20px;
+      height: 46px;
+      font-size: 15px;
     }
   }
 
   @media (max-width: 480px) {
     .header {
+      padding: 14px;
       font-size: 16px;
-      padding: 12px 14px;
     }
 
     #chatBody {
-      padding: 10px 12px;
+      padding: 12px;
+      gap: 12px;
     }
 
     .bubble {
-      font-size: 14px;
-      padding: 10px 12px;
+      font-size: 14.5px;
+      padding: 12px 14px;
+    }
+
+    #inputBar {
+      padding: 12px 12px 16px;
+    }
+
+    #input {
+      padding: 11px 13px;
     }
 
     #sendBtn {
-      padding: 10px 14px;
+      padding: 11px 18px;
     }
   }
 </style>
@@ -237,7 +249,7 @@ async function send() {
 
   addMsg("user", q);
   input.value = "";
-  input.style.height = "44px";
+  input.style.height = "48px";
   sendBtn.disabled = true;
 
   try {
@@ -277,11 +289,11 @@ input.addEventListener("keydown", e => {
 });
 
 input.addEventListener("input", () => {
-  input.style.height = "44px";
+  input.style.height = "48px";
   input.style.height = Math.min(input.scrollHeight, 120) + "px";
 });
 
-// Prevent zoom on double-tap for iOS
+// Prevent double-tap zoom on mobile
 let lastTouchEnd = 0;
 document.addEventListener('touchend', e => {
   const now = Date.now();
@@ -292,7 +304,7 @@ document.addEventListener('touchend', e => {
 }, false);
 
 addMsg("bot",
-  "Hello, I'm Agent K — an AI assistant trained on Kyle's background and technical experience. What would you like to know?"
+  "Hi, I'm Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
 );
 </script>
 
