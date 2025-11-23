@@ -284,7 +284,6 @@ async function send() {
   // Debug message
 
   try {
-    console.log("Sending to backend:", q);
     
     const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
       method: "POST",
@@ -292,16 +291,13 @@ async function send() {
       body: JSON.stringify({ q })
     });
 
-    console.log("Response status:", res.status);
-    console.log("Response:", res);
-
     if (!res.ok) {
       addMsg("bot", "Backend is waking up... Try again.");
       return;
     }
 
     const data = await res.json();
-    console.log("Data received:", data);
+
     addMsg("bot", data.answer);
   } catch (err) {
     console.log("ERROR:", err);
