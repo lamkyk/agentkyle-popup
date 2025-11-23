@@ -12,58 +12,62 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      /* Make outer background transparent so it matches the site */
-      background: transparent;
+      background: transparent !important;
       font-family: 'Lato', sans-serif;
-      font-size: 12px;
+      font-size: 14px;
       color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    /* Chat Shell (Apple Card Style) */
+    /* Chat Shell */
     .shell {
       width: min(420px, 100vw - 24px);
       height: min(640px, 100vh - 40px);
-      background: #ffffff;
-      border-radius: 26px;
-      box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+
+      /* background white but blending with page */
+      background: rgba(255, 255, 255, 0.95);
+
+      border-radius: 20px;
+      box-shadow: none !important;   /* remove shadow */
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      border: 1px solid #eaeaea;     /* subtle frame to define edges */
     }
 
     /* Header */
     .header {
       padding: 14px 18px;
       border-bottom: 1px solid #e6e6e6;
-      background: #fafafa;
+      background: #fafafa00; /* transparent header */
     }
 
     .title {
-      font-size: 15px;
-      font-weight: 900; /* Lato Black */
+      font-size: 17px;
+      font-weight: 900;
       color: #111;
     }
 
     .subtitle {
-      margin-top: 3px;
-      font-size: 12px;
+      margin-top: 4px;
+      font-size: 13px;
       color: #666;
     }
 
     /* Chat Body */
     #chatBody {
       flex: 1;
-      padding: 12px 16px;
+      padding: 14px 16px;
       overflow-y: auto;
-      background: #f2f2f7;
+      background: transparent;
+      font-size: 14px;
     }
 
     .msg-row {
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .msg-user {
@@ -76,11 +80,11 @@
 
     .bubble {
       max-width: 78%;
-      padding: 10px 12px;
-      border-radius: 16px;
-      font-size: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 14px;
       white-space: pre-wrap;
-      line-height: 1.45;
+      line-height: 1.55;
     }
 
     .bubble-user {
@@ -97,10 +101,9 @@
     }
 
     .meta {
-      font-size: 11px;
+      font-size: 12px;
       color: #888;
       margin-bottom: 6px;
-      text-align: left;
     }
 
     /* Input Area */
@@ -108,23 +111,21 @@
       display: flex;
       padding: 10px;
       border-top: 1px solid #e6e6e6;
-      background: #fff;
+      background: transparent;
       gap: 8px;
       align-items: flex-end;
     }
 
     #input {
       flex: 1;
-      height: auto;
-      min-height: 36px;
-      max-height: 80px;
+      min-height: 40px;
+      max-height: 100px;
       border-radius: 8px;
       border: 1px solid #ddd;
       padding: 8px 10px;
-      font-size: 12px;
-      font-family: 'Lato', sans-serif;
-      outline: none;
+      font-size: 14px;
       resize: none;
+      font-family: 'Lato', sans-serif;
     }
 
     #sendBtn {
@@ -132,7 +133,7 @@
       border-radius: 8px;
       background: #007aff;
       color: white;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 700;
       border: none;
       cursor: pointer;
@@ -147,6 +148,7 @@
         width: 100vw;
         height: 100vh;
         border-radius: 0;
+        border: none;
       }
     }
   </style>
@@ -154,10 +156,12 @@
 
 <body>
 <div class="shell">
+
   <!-- Header -->
   <div class="header">
     <div class="title">Chat with AI Agent Kyle</div>
-<div class="subtitle" style="display:none;"></div>
+    <!-- DELETE / EDIT THIS LINE -->
+    <div class="subtitle">Your interview-focused assistant.</div>
   </div>
 
   <!-- Chat Body -->
@@ -170,21 +174,22 @@
   </div>
 </div>
 
-
 <script>
-/* ------------------ Resume Knowledge Base ------------------ */
+/* ---------- RESUME KNOWLEDGE BASE (unchanged yet) ---------- */
+/* We will build the BIG KB after you confirm appearance. */
 
 const summary = {
   overview:
-    "Kyle Lam is a systems-minded operator with 6+ years in SaaS and B2B2C customer success and several years in the autonomous vehicle space focused on systems engineering testing.",
+    "Kyle Lam is a systems-minded operator with 6+ years in SaaS, B2B2C customer success, and multiple years in autonomous vehicle systems testing.",
   strengths: [
-    "Designing and executing structured testing programs for complex systems.",
-    "Partnering cross-functionally across engineering, ops, and vendor teams.",
-    "Turning operational data into clear narratives and recommendations.",
-    "Owning enterprise customer relationships and renewals in SaaS contexts."
+    "Structured testing for complex systems.",
+    "Cross-functional execution with engineering and ops.",
+    "Turning operational data into insights.",
+    "Owning enterprise customer relationships."
   ]
 };
 
+/* Roles Array (shortened for now; we'll rebuild with full KB next) */
 const roles = [
   {
     id: "waymo_sse",
@@ -192,223 +197,113 @@ const roles = [
     org: "Waymo",
     location: "Mountain View, CA",
     situation:
-      "Waymo needed reliable ways to validate next-generation sensors and AV behavior before expanding ODD and rider operations.",
+      "Waymo needed reliable validation for next-generation sensors and AV behaviors.",
     task:
-      "Kyle designed and executed structured test campaigns to ensure systems met performance and safety thresholds.",
+      "Kyle executed structured test campaigns ensuring systems met safety thresholds.",
     actions: [
-      "Developed and executed test plans for new sensors and behaviors.",
-      "Collaborated with engineers, PMs, and vendors to define metrics.",
-      "Created dashboards for forecasting, burndown, and capacity planning.",
-      "Authored SOPs and training materials for consistent testing execution."
+      "Built and executed detailed test plans.",
+      "Collaborated with engineers and PMs.",
+      "Authored SOPs and training docs."
     ],
     results: [
-      "Unblocked deployments through critical scenario generation.",
-      "Improved throughput and predictability of testing milestones.",
-      "Raised overall quality and consistency of AV testing programs."
+      "Unblocked deployments.",
+      "Improved predictability of milestones."
     ],
-    keywords: ["waymo", "sensor", "av", "autonomous", "system", "testing", "validation"]
-  },
-
-  {
-    id: "waymo_ops",
-    title: "Autonomous Vehicle Instructor / Rider Operational Readiness",
-    org: "Waymo",
-    location: "Mountain View, CA",
-    situation:
-      "Waymo was preparing to scale rider operations and needed reliable operators to validate UX and operational workflows.",
-    task:
-      "Kyle executed structured on-road test cases while capturing high-quality UX and operations feedback.",
-    actions: [
-      "Ran real-world rider scenarios and logged behaviors and UX gaps.",
-      "Partnered with rider support, dispatch, and UX teams for insights.",
-      "Mentored operator cohorts on safety standards and structured testing."
-    ],
-    results: [
-      "Improved operational readiness ahead of rider program expansion.",
-      "Strengthened cross-team handoffs with structured feedback."
-    ],
-    keywords: ["rider", "operations", "instructor", "on-road", "ux"]
-  },
-
-  {
-    id: "narvar",
-    title: "Enterprise Customer Success Manager",
-    org: "Narvar",
-    location: "San Francisco, CA",
-    situation:
-      "Major retail brands depended on Narvar for post-purchase experiences and needed a strong CS owner.",
-    task:
-      "Kyle managed enterprise accounts, driving adoption, alignment, and measurable ROI.",
-    actions: [
-      "Led onboarding and QBRs with senior stakeholders.",
-      "Coordinated with product/engineering on feature configuration.",
-      "Identified upsell opportunities tied to business value."
-    ],
-    results: [
-      "Retained core accounts and protected revenue.",
-      "Enabled seamless migrations to advanced platform capabilities."
-    ],
-    keywords: ["saas", "customer success", "retail", "enterprise"]
-  },
-
-  {
-    id: "nasdaq",
-    title: "Service Account Manager",
-    org: "Nasdaq",
-    location: "San Francisco, CA",
-    situation:
-      "Nasdaq needed reliable account management for a diverse book of listed corporate clients.",
-    task:
-      "Kyle owned renewals, service coordination, and consultative relationship management.",
-    actions: [
-      "Acted as main point of contact for corporate accounts.",
-      "Led executive business reviews translating metrics to insights.",
-      "Partnered with product, operations, and legal to meet SLAs."
-    ],
-    results: [
-      "Supported retention of recurring revenue.",
-      "Generated incremental revenue through consultative upsells."
-    ],
-    keywords: ["nasdaq", "account", "corporate", "service", "capital markets"]
+    keywords: ["waymo","sensor","testing","validation","av"]
   }
 ];
 
 const skills = [
-  "Testing and validation of complex systems.",
-  "Program and project management.",
-  "SaaS customer success and enterprise account management.",
-  "Stakeholder management and cross-functional execution.",
-  "JIRA/JQL, SQL, HTML, dashboards and tooling.",
-  "Linux, macOS, and internal CMS systems."
+  "Systems testing.",
+  "Program management.",
+  "Customer success.",
+  "Cross-functional execution.",
+  "SQL, JQL, HTML.",
+  "Linux & macOS."
 ];
 
-/* ------------------ STAR ENGINE ------------------ */
+/* ---------- Answer Engine ---------- */
+function tokenize(t){return t.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);}
+const STOP=new Set(["the","and","for","with","that","this","from","into","about","have","has","what","why","who","how","are","you","his","her","their","did","does","can","role","fit","tell","me","ask","years"]);
 
-function tokenize(text) {
-  return text
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
-}
-
-const STOP = new Set([
-  "the","and","for","with","that","this","from","into","about","have","has",
-  "had","been","more","than","role","what","does","did","you","your","his",
-  "her","their","how","many","years","tell","me","can","who","where","when",
-  "why","are","was","will","would","could","should","do","on","in","at","to",
-  "of","a","an","as","by","or","it","is","be","based","using"
-]);
-
-function extractKeywords(q) {
+function extractKeywords(q){
   return tokenize(q).filter(w => w.length > 2 && !STOP.has(w));
 }
 
-function scoreRole(role, kw) {
-  const blob = (
-    role.title + " " +
-    role.org + " " +
-    role.situation + " " +
-    role.task + " " +
-    role.actions.join(" ") + " " +
-    role.results.join(" ")
-  ).toLowerCase();
-
-  let s = 0;
-  for (const k of kw) {
-    if (blob.includes(k)) s++;
-    if (role.keywords.includes(k)) s++;
+function scoreRole(role, words){
+  const blob=(role.title+" "+role.org+" "+role.situation+" "+role.task+" "+role.actions.join(" ")+role.results.join(" ")).toLowerCase();
+  let s=0;
+  for(const w of words){
+    if(blob.includes(w)) s++;
+    if(role.keywords.includes(w)) s++;
   }
   return s;
 }
 
-function buildAnswer(q) {
-  const kw = extractKeywords(q);
+function buildAnswer(q){
+  const kw=extractKeywords(q);
 
-  if (kw.length === 0) {
-    return (
-      "Here is a quick overview:\n\n" +
-      "• " + summary.overview + "\n\n" +
-      "Strengths:\n" +
-      summary.strengths.map(s => "• " + s).join("\n")
-    );
+  if(kw.length===0){
+    return summary.overview + "\n\nStrengths:\n" + summary.strengths.map(s=>"• "+s).join("\n");
   }
 
   const matches = roles
-    .map(r => ({ role: r, score: scoreRole(r, kw) }))
-    .filter(r => r.score > 0)
-    .sort((a,b) => b.score - a.score);
+    .map(r=>({role:r,score:scoreRole(r,kw)}))
+    .filter(x=>x.score>0)
+    .sort((a,b)=>b.score-a.score);
 
-  if (matches.length === 0) {
-    return (
-      "The resume does not directly mention that, but in general Kyle brings:\n\n" +
-      skills.map(s => "• " + s).join("\n")
-    );
+  if(matches.length===0){
+    return "Here’s what Kyle generally brings:\n\n" + skills.map(s=>"• "+s).join("\n");
   }
 
-  const best = matches[0].role;
+  const r = matches[0].role;
 
-  return (
-    `${best.title} at ${best.org} (${best.location})\n\n` +
-    `Situation: ${best.situation}\n\n` +
-    `Task: ${best.task}\n\n` +
-    `Action:\n` +
-    best.actions.map(a => "• " + a).join("\n") +
-    `\n\nResult:\n` +
-    best.results.map(r => "• " + r).join("\n")
-  );
+  return `${r.title} at ${r.org} (${r.location})\n\nSituation: ${r.situation}\n\nTask: ${r.task}\n\nActions:\n${r.actions.map(a=>"• "+a).join("\n")}\n\nResults:\n${r.results.map(a=>"• "+a).join("\n")}`;
 }
 
-/* ------------------ Chat UI Logic ------------------ */
+/* ---------- UI Logic ---------- */
+const chatBody=document.getElementById("chatBody");
+const input=document.getElementById("input");
+const sendBtn=document.getElementById("sendBtn");
 
-const chatBody = document.getElementById("chatBody");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("sendBtn");
-
-function addMsg(type, text) {
-  const row = document.createElement("div");
-  row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
-
-  const bubble = document.createElement("div");
-  bubble.className = "bubble " + (type === "user" ? "bubble-user" : "bubble-bot");
-  bubble.textContent = text;
-
+function addMsg(type,text){
+  const row=document.createElement("div");
+  row.className="msg-row "+(type==="user"?"msg-user":"msg-bot");
+  const bubble=document.createElement("div");
+  bubble.className="bubble "+(type==="user"?"bubble-user":"bubble-bot");
+  bubble.textContent=text;
   row.appendChild(bubble);
   chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
+  chatBody.scrollTop=chatBody.scrollHeight;
 }
 
-function addMeta(text) {
-  const m = document.createElement("div");
-  m.className = "meta";
-  m.textContent = text;
+function addMeta(t){
+  const m=document.createElement("div");
+  m.className="meta";
+  m.textContent=t;
   chatBody.appendChild(m);
 }
 
-function send() {
-  const q = input.value.trim();
-  if (!q) return;
-
-  addMsg("user", q);
-  input.value = "";
-
-  const ans = buildAnswer(q);
-  addMsg("bot", ans);
+function send(){
+  const q=input.value.trim();
+  if(!q) return;
+  addMsg("user",q);
+  input.value="";
+  addMsg("bot",buildAnswer(q));
 }
 
-sendBtn.onclick = send;
-
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
+sendBtn.onclick=send;
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){
     e.preventDefault();
     send();
   }
 });
 
-function welcome() {
-  addMsg("bot", "Hi, I’m Agent Kyle. Ask me anything about Kyle’s experience or how he fits a role.");
-  addMeta("Try: “What did Kyle do in the autonomous driving industry?” or “Tell me about his strengths for a TPM role.”");
+function welcome(){
+  addMsg("bot","Hi, I’m Agent Kyle. Ask me anything about Kyle’s experience or how he fits a role.");
+  addMeta(`Try: “What did Kyle do in the autonomous driving industry?” or “Tell me about his strengths for a TPM role.”`);
 }
-
 welcome();
 </script>
 
