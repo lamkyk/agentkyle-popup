@@ -281,12 +281,20 @@ async function send() {
   addMsg("user", q);
   input.value = "";
 
+  // Debug message
+  addMsg("bot", "🔄 Calling backend...");
+
   try {
+    console.log("Sending to backend:", q);
+    
     const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ q })
     });
+
+    console.log("Response status:", res.status);
+    console.log("Response:", res);
 
     if (!res.ok) {
       addMsg("bot", "Backend is waking up... Try again.");
@@ -294,9 +302,10 @@ async function send() {
     }
 
     const data = await res.json();
+    console.log("Data received:", data);
     addMsg("bot", data.answer);
   } catch (err) {
-    console.log(err);
+    console.log("ERROR:", err);
     addMsg("bot", "Backend unreachable. Try again in 10 seconds.");
   }
 }
