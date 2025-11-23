@@ -274,13 +274,33 @@ function addMsg(type, text) {
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-function send() {
+async function send() {
   const q = input.value.trim();
   if (!q) return;
+
   addMsg("user", q);
   input.value = "";
-  const ans = buildAnswer(q);
-  addMsg("bot", ans);
+
+  try {
+    const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q })
+    });
+
+    if (!res.ok) {
+      addMsg("bot", "Backend is waking up... Try again.");
+      return;
+    }
+
+    const data = await res.json();
+    addMsg("bot", data.answer);
+  } catch (err) {
+    console.log(err);
+    addMsg("bot", "Backend unreachable. Try again in 10 seconds.");
+  }
+}
+
 }
 
 sendBtn.onclick = send;
