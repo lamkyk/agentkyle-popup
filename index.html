@@ -1,216 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Agent K Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<title>Agent K Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Lato", sans-serif !important;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Lato", sans-serif !important;
+}
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: transparent;
-    }
+/* stable height model */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
 
-    .wrapper {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+.wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    .header {
-      padding: 16px 20px;
-      background: white;
-      border-bottom: 1px solid #eee;
-      font-size: 20px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
+/* header */
+.header {
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  font-size: 20px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
 
-    @media (min-width: 768px) {
-      .header {
-        font-size: 24px;
-      }
-    }
+@media (min-width: 768px) {
+  .header {
+    font-size: 24px;
+  }
+}
 
-    .chat-inner {
-      width: 100%;
-      max-width: 650px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
+/* centered content column */
+.chat-inner {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
 
-    @media (min-width: 768px) {
-      .chat-inner {
-        max-width: 980px;
-      }
-    }
+@media (min-width: 768px) {
+  .chat-inner {
+    max-width: 980px;
+  }
+}
 
-    #chatBody {
-      overflow-y: auto;
-      padding: 16px 20px;
-      padding-bottom: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      -webkit-overflow-scrolling: touch;
-    }
+/* main scroll area – height controlled by JS */
+#chatBody {
+  overflow-y: auto;
+  padding: 16px 20px;
+  padding-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+}
 
-    #chatBody::after {
-      content: "";
-      height: 1px;
-      display: block;
-    }
+#chatBody::after {
+  content: "";
+  height: 1px;
+  display: block;
+}
 
-    #inputBar {
-      padding: 14px 20px;
-      background: #fff;
-      border-top: 1px solid #ddd;
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-      flex-shrink: 0;
-      z-index: 30;
-      transform: translateY(-30px);
-    }
+/* input bar – floating above bottom */
+#inputBar {
+  padding: 14px 20px;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  z-index: 30;
+  transform: translateY(-40px);
+}
 
-    .footer-note {
-      text-align: center;
-      font-size: 10px;
-      color: #555;
-      opacity: 0.85;
-      padding: 8px 0 16px;
-      transform: translateY(-30px);
-      margin-top: 4px;
-      margin-bottom: calc(12px + env(safe-area-inset-bottom));
-      line-height: 1.3;
-    }
+/* suggestion strip just below input bar */
+#suggestions {
+  margin: 0 20px;
+  margin-top: -34px; /* visually just below input bar */
+  margin-bottom: 4px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #4b5563;
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 
-    #input {
-      flex: 1;
-      min-height: 48px;
-      max-height: 140px;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      resize: none;
-      outline: none;
-      font-size: 16px;
-    }
+.suggestion-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
 
-    #sendBtn {
-      padding: 12px 20px;
-      height: 48px;
-      border-radius: 12px;
-      border: none;
-      background: #1f2937;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
+.suggestion-pill {
+  border-radius: 999px;
+  padding: 3px 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    .msg-row {
-      display: flex;
-    }
+/* footer */
+.footer-note {
+  text-align: center;
+  font-size: 10px;
+  color: #555;
+  opacity: 0.85;
+  padding: 16px 0;
+  transform: translateY(-40px);
+  margin-top: 10px;
+  margin-bottom: calc(20px + env(safe-area-inset-bottom));
+  line-height: 1.3;
+}
 
-    .msg-user {
-      justify-content: flex-end;
-    }
+/* inputs */
+#input {
+  flex: 1;
+  min-height: 48px;
+  max-height: 140px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  resize: none;
+  outline: none;
+  font-size: 16px;
+}
 
-    .msg-bot {
-      justify-content: flex-start;
-    }
+#sendBtn {
+  padding: 12px 20px;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: #1f2937;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
 
-    .bubble {
-      max-width: 85%;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-size: 16px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
+/* messages */
+.msg-row {
+  display: flex;
+}
 
-    .bubble-user {
-      background: #1f2937;
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
+.msg-user {
+  justify-content: flex-end;
+}
 
-    .bubble-bot {
-      background: #f5f5f5;
-      color: #111;
-      border-bottom-left-radius: 4px;
-    }
+.msg-bot {
+  justify-content: flex-start;
+}
 
-    /* Suggestions container – small, below input, non-blocking */
-    #suggestionsBar {
-      position: relative;
-      width: 100%;
-      max-width: 650px;
-      margin: 0 auto;
-      transform: translateY(-26px);
-      padding: 0 20px;
-      flex-shrink: 0;
-      pointer-events: none; /* children re-enable */
-    }
+.bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+}
 
-    @media (min-width: 768px) {
-      #suggestionsBar {
-        max-width: 980px;
-      }
-    }
+.bubble-user {
+  background: #1f2937;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
 
-    .suggestions-inner {
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      background: rgba(249, 250, 251, 0.95);
-      border-radius: 10px;
-      border: 1px solid #e5e7eb;
-      padding: 4px 6px;
-      max-width: 100%;
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
-      font-size: 11px;
-      pointer-events: auto;
-    }
-
-    .suggestions-inner.hidden {
-      display: none;
-    }
-
-    .suggestion-pill {
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      padding: 4px 8px;
-      background: #ffffff;
-      font-size: 11px;
-      cursor: pointer;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .suggestion-pill:hover {
-      background: #f3f4f6;
-    }
-  </style>
+.bubble-bot {
+  background: #f5f5f5;
+  color: #111;
+  border-bottom-left-radius: 4px;
+}
+</style>
 </head>
 
 <body>
@@ -233,10 +220,7 @@
       <button id="sendBtn">Send</button>
     </div>
 
-    <!-- Suggestions row (non-blocking, below input) -->
-    <div id="suggestionsBar">
-      <div id="suggestionsInner" class="suggestions-inner hidden"></div>
-    </div>
+    <div id="suggestions"></div>
 
     <div class="footer-note">
       Agent K can make mistakes. Feel free to reach out directly.<br><br>
@@ -248,18 +232,22 @@
 </div>
 
 <script>
+const API_BASE = "https://agentkyle-secure-backend.onrender.com";
+
+/* DRAMATICALLY SIMPLIFIED + CORRECT mobile stable height */
 function adjustHeights() {
   const vv = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
   const headerH = document.querySelector('.header').offsetHeight;
   const inputH = document.querySelector('#inputBar').offsetHeight;
   const footerH = document.querySelector('.footer-note').offsetHeight;
-  const suggH = document.querySelector('#suggestionsBar').offsetHeight;
+  const suggH = document.querySelector('#suggestions').offsetHeight || 0;
 
   const chatBody = document.querySelector('#chatBody');
 
   const extra = 20;
-  let available = vv - headerH - inputH - footerH - suggH - extra + 30;
+  let available = vv - headerH - inputH - footerH - suggH - extra + 40;
+
   if (available < 140) available = 140;
 
   chatBody.style.height = available + "px";
@@ -273,11 +261,13 @@ if (window.visualViewport) {
 window.addEventListener("orientationchange", adjustHeights);
 window.addEventListener("load", adjustHeights);
 
+/* chat logic */
 const chatBodyEl = document.getElementById("chatBody");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
-const suggestionsInner = document.getElementById("suggestionsInner");
+const suggestionsEl = document.getElementById("suggestions");
 let lastBotText = "";
+let suggestTimer = null;
 
 function addMsg(type, text) {
   const row = document.createElement("div");
@@ -297,51 +287,53 @@ function addMsg(type, text) {
   });
 }
 
+/* suggestions UI */
 function hideSuggestions() {
-  suggestionsInner.classList.add("hidden");
-  suggestionsInner.innerHTML = "";
+  suggestionsEl.style.display = "none";
+  suggestionsEl.innerHTML = "";
 }
 
-function renderSuggestions(list) {
-  if (!list || list.length === 0) {
+function showSuggestions(list) {
+  const unique = Array.from(new Set(list.filter(Boolean)));
+  if (unique.length === 0) {
     hideSuggestions();
     return;
   }
 
-  // Remove duplicates and trim
-  const uniq = Array.from(new Set(list.map(q => q.trim()))).filter(Boolean);
-  if (uniq.length === 0) {
-    hideSuggestions();
-    return;
-  }
+  suggestionsEl.innerHTML = "";
 
-  suggestionsInner.innerHTML = "";
-  uniq.slice(0, 5).forEach(q => {
+  const label = document.createElement("span");
+  label.className = "suggestion-label";
+  label.textContent = "Try:";
+  suggestionsEl.appendChild(label);
+
+  unique.forEach(q => {
     const pill = document.createElement("button");
     pill.type = "button";
     pill.className = "suggestion-pill";
     pill.textContent = q;
     pill.addEventListener("click", () => {
       input.value = q;
+      input.focus();
       hideSuggestions();
-      send();
+      adjustHeights();
     });
-    suggestionsInner.appendChild(pill);
+    suggestionsEl.appendChild(pill);
   });
 
-  suggestionsInner.classList.remove("hidden");
+  suggestionsEl.style.display = "flex";
+  adjustHeights();
 }
 
-let suggestTimer = null;
-async function fetchSuggestions(text) {
-  const q = text.trim();
-  if (!q) {
+async function fetchSuggestions(queryText) {
+  const q = queryText.trim();
+  if (q.length < 2) {
     hideSuggestions();
     return;
   }
 
   try {
-    const res = await fetch("https://agentkyle-secure-backend.onrender.com/suggest", {
+    const res = await fetch(API_BASE + "/suggest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ q })
@@ -351,8 +343,8 @@ async function fetchSuggestions(text) {
       return;
     }
     const data = await res.json();
-    renderSuggestions(data.suggestions || []);
-  } catch (e) {
+    showSuggestions(data.suggestions || []);
+  } catch {
     hideSuggestions();
   }
 }
@@ -362,14 +354,13 @@ async function send() {
   if (!q) return;
 
   hideSuggestions();
-
   addMsg("user", q);
   input.value = "";
   input.style.height = "48px";
   sendBtn.disabled = true;
 
   try {
-    const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
+    const res = await fetch(API_BASE + "/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -379,18 +370,15 @@ async function send() {
     });
 
     if (!res.ok) {
-      addMsg("bot", "Agent K is having trouble connecting. Please try again in a moment.");
+      addMsg("bot", "Agent K had trouble reaching the server. Please try again in a moment.");
       sendBtn.disabled = false;
       return;
     }
 
     const data = await res.json();
-    const answer = data.answer && data.answer.trim()
-      ? data.answer.trim()
-      : "Kyle’s background spans autonomous systems, validation, operations, SaaS workflows, and applied AI tools. Try asking about a specific area, and Agent K can go deeper.";
-    addMsg("bot", answer);
+    addMsg("bot", data.answer || "Agent K was not able to form a clear answer. Try asking in a different way.");
   } catch {
-    addMsg("bot", "Agent K ran into a network issue. Please try again.");
+    addMsg("bot", "There was a network issue. Please try again.");
   }
 
   sendBtn.disabled = false;
@@ -412,21 +400,14 @@ input.addEventListener("input", () => {
   chatBodyEl.scrollTop = chatBodyEl.scrollHeight;
   adjustHeights();
 
-  // Debounced suggestions
-  clearTimeout(suggestTimer);
+  if (suggestTimer) clearTimeout(suggestTimer);
   const text = input.value;
-  if (!text.trim()) {
-    hideSuggestions();
-    return;
-  }
-  suggestTimer = setTimeout(() => fetchSuggestions(text), 250);
+  suggestTimer = setTimeout(() => fetchSuggestions(text), 220);
 });
 
-// Hide suggestions on outside click
+/* hide suggestions when clicking outside */
 document.addEventListener("click", (e) => {
-  const withinInput = e.target === input || e.target === sendBtn;
-  const withinSuggestions = suggestionsInner.contains(e.target);
-  if (!withinInput && !withinSuggestions) {
+  if (!suggestionsEl.contains(e.target) && e.target !== input) {
     hideSuggestions();
   }
 });
@@ -442,9 +423,10 @@ document.addEventListener("touchend", (e) => {
 /* initial greeting */
 addMsg(
   "bot",
-  "Agent K is ready. Ask about Kyle’s experience, strengths, or how he works in autonomous systems, validation, program execution, customer success, or AI projects."
+  "Hi, I am Agent K. Give me a few seconds to wake up. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
 );
 
+/* run once on load */
 adjustHeights();
 </script>
 </body>
