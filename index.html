@@ -15,7 +15,7 @@
   font-family: "Lato", sans-serif !important;
 }
 
-/* true viewport height, no parent scroll */
+/* real dynamic viewport height */
 html, body {
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
@@ -23,7 +23,7 @@ html, body {
   background: transparent;
 }
 
-/* entire app is fixed height */
+/* full height internal layout */
 .wrapper {
   height: calc(var(--vh, 1vh) * 100);
   width: 100%;
@@ -50,13 +50,33 @@ html, body {
   flex-direction: column;
   gap: 14px;
   -webkit-overflow-scrolling: touch;
+  background: transparent;
 }
 
-/* kills bottom white-space */
+/* remove “white gap” on bottom */
 #chatBody::after {
   content: "";
   height: 1px;
   display: block;
+}
+
+/* scrollbar track background */
+#chatBody::-webkit-scrollbar {
+  width: 8px;
+}
+
+#chatBody::-webkit-scrollbar-track {
+  background: white; /* or transparent */
+}
+
+#chatBody::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+/* Firefox scrollbar color */
+#chatBody {
+  scrollbar-color: #ccc white;
 }
 
 #inputBar {
@@ -94,6 +114,7 @@ html, body {
   flex-shrink: 0;
 }
 
+/* messages */
 .msg-row {
   display: flex;
 }
@@ -126,6 +147,7 @@ html, body {
   border-bottom-left-radius: 4px;
 }
 </style>
+
 </head>
 <body>
 
@@ -148,13 +170,17 @@ html, body {
 </div>
 
 <script>
+/* dynamic viewport height fix */
 function updateVH() {
-  document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 window.addEventListener('resize', updateVH);
 window.addEventListener('orientationchange', updateVH);
+window.addEventListener('load', updateVH);
 updateVH();
 
+/* chat logic */
 const chatBody = document.getElementById("chatBody");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
@@ -226,6 +252,7 @@ input.addEventListener("input", () => {
   chatBody.scrollTop = chatBody.scrollHeight;
 });
 
+/* iOS double-tap zoom prevention */
 let lastTouchEnd = 0;
 document.addEventListener(
   "touchend",
@@ -237,10 +264,12 @@ document.addEventListener(
   false
 );
 
+/* initial greeting */
 addMsg(
   "bot",
   "Hi, I am Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
 );
 </script>
+
 </body>
 </html>
