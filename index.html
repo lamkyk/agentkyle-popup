@@ -5,11 +5,9 @@
   <title>Agent K Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Lato font -->
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
 <style>
-  /* Enforce Lato on absolutely everything */
   * {
     box-sizing: border-box;
     margin: 0;
@@ -19,14 +17,13 @@
 
   html, body {
     width: 100%;
-    height: 100%;
-    overflow: auto;
+    height: auto;
+    overflow: visible;
     background: transparent;
     -webkit-overflow-scrolling: touch;
   }
 
   .wrapper {
-    min-height: 100vh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -34,7 +31,6 @@
   }
 
   .header {
-    flex-shrink: 0;
     padding: 16px 20px;
     background: white;
     border-bottom: 1px solid #eee;
@@ -42,41 +38,37 @@
     font-weight: 600;
   }
 
-  /* CHAT AREA */
+  /* CHAT BODY – no internal scrolling */
   #chatBody {
-    flex: 1;
-    overflow-y: auto;
+    width: 100%;
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    -webkit-overflow-scrolling: touch;
+    overflow: visible;
   }
 
-  /* Sticky input bar */
+  /* INPUT BAR – not sticky, appears at bottom of iframe */
   #inputBar {
-    position: sticky;
-    bottom: 0;
     padding: 14px 16px;
     background: #fff;
     border-top: 1px solid #ddd;
     display: flex;
     gap: 10px;
     align-items: flex-end;
-    z-index: 20;
+    position: relative;
+    width: 100%;
   }
 
   #input {
     flex: 1;
     min-height: 48px;
-    max-height: 120px;
+    max-height: 140px;
     padding: 12px;
     border-radius: 12px;
     border: 1px solid #ddd;
-    background: #fff;
     resize: none;
     outline: none;
-    font-family: "Lato", sans-serif;
     font-size: 15px;
   }
 
@@ -91,16 +83,18 @@
     font-weight: 600;
     cursor: pointer;
     flex-shrink: 0;
-    font-family: "Lato", sans-serif;
   }
 
-  /* Message bubbles */
+  /* BUBBLES */
   .msg-row {
     display: flex;
+    width: 100%;
   }
+
   .msg-user {
     justify-content: flex-end;
   }
+
   .msg-bot {
     justify-content: flex-start;
   }
@@ -111,7 +105,6 @@
     border-radius: 14px;
     font-size: 15px;
     line-height: 1.42;
-    font-family: "Lato", sans-serif;
   }
 
   .bubble-user {
@@ -165,9 +158,7 @@
     row.appendChild(bubble);
     chatBody.appendChild(row);
 
-    requestAnimationFrame(() => {
-      chatBody.scrollTop = chatBody.scrollHeight;
-    });
+    requestAnimationFrame(sendResize); // update iframe height
   }
 
   async function send() {
@@ -176,7 +167,7 @@
 
     addMsg("user", q);
     input.value = "";
-    input.style.height = "44px";
+    input.style.height = "48px";
     sendBtn.disabled = true;
 
     try {
@@ -190,7 +181,10 @@
       );
 
       if (!res.ok) {
-        addMsg("bot", "The backend is waking up. Please try again in a moment.");
+        addMsg(
+          "bot",
+          "The backend is waking up. Please try again in a moment."
+        );
         sendBtn.disabled = false;
         return;
       }
@@ -215,8 +209,9 @@
   });
 
   input.addEventListener("input", () => {
-    input.style.height = "44px";
-    input.style.height = Math.min(input.scrollHeight, 112) + "px";
+    input.style.height = "48px";
+    input.style.height = Math.min(input.scrollHeight, 140) + "px";
+    sendResize();
   });
 
   // Prevent double-tap zoom on iOS
@@ -233,20 +228,24 @@
     false
   );
 
-  // Initial greeting
+  // Greeting
   addMsg(
     "bot",
     "Hi, I am Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
   );
 </script>
 
+<!-- Auto-resize iframe height (Google Sites requires this) -->
 <script>
   function sendResize() {
     const height = document.documentElement.scrollHeight;
-    parent.postMessage(JSON.stringify({
-      type: "embed-size",
-      height: height
-    }), "*");
+    parent.postMessage(
+      JSON.stringify({
+        type: "embed-size",
+        height: height
+      }),
+      "*"
+    );
   }
 
   const observer = new ResizeObserver(sendResize);
