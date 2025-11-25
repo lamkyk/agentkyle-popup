@@ -323,5 +323,22 @@
       "Hi, I am Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
     );
   </script>
+  <script>
+  function sendResize() {
+    const height = document.documentElement.scrollHeight;
+    parent.postMessage(JSON.stringify({
+      type: "embed-size",
+      height: height
+    }), "*");
+  }
+
+  // Run whenever the page changes height
+  const observer = new ResizeObserver(sendResize);
+  observer.observe(document.body);
+
+  // Initial fire
+  window.onload = sendResize;
+</script>
+  
 </body>
 </html>
