@@ -15,7 +15,6 @@
   font-family: "Lato", sans-serif !important;
 }
 
-/* stable height model */
 html, body {
   width: 100%;
   height: 100%;
@@ -40,11 +39,8 @@ html, body {
   font-weight: 600;
   flex-shrink: 0;
 }
-
 @media (min-width: 768px) {
-  .header {
-    font-size: 24px;
-  }
+  .header { font-size: 24px; }
 }
 
 /* centered content column */
@@ -56,31 +52,26 @@ html, body {
   flex-direction: column;
   flex: 1;
 }
-
 @media (min-width: 768px) {
-  .chat-inner {
-    max-width: 980px;
-  }
+  .chat-inner { max-width: 980px; }
 }
 
-/* main scroll area – height controlled by JS */
+/* main scroll area */
 #chatBody {
   overflow-y: auto;
-  padding: 16px 20px;
-  padding-bottom: 32px;
+  padding: 16px 20px 32px 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
   -webkit-overflow-scrolling: touch;
 }
-
 #chatBody::after {
   content: "";
   height: 1px;
   display: block;
 }
 
-/* input bar – floating above bottom */
+/* input bar – lifted */
 #inputBar {
   padding: 14px 20px;
   background: #fff;
@@ -93,21 +84,23 @@ html, body {
   transform: translateY(-40px);
 }
 
-/* suggestion strip just below input bar */
+/* suggestion box BELOW input */
 #suggestions {
-  margin: 0 20px;
-  margin-top: -34px; /* visually just below input bar */
-  margin-bottom: 4px;
-  background: #f2f2f2;             /* solid light gray, no bleed-through */
-  border: 1px solid #d1d5db;
+  width: calc(100% - 40px);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -20px;
+  background: #f1f3f5;
+  border: 1px solid #d9dce0;
   border-radius: 10px;
-  padding: 4px 8px;
+  padding: 6px 8px;
   font-size: 11px;
   color: #4b5563;
   display: none;
   flex-wrap: wrap;
   gap: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  z-index: 29;
+  position: relative;
 }
 
 .suggestion-label {
@@ -118,14 +111,13 @@ html, body {
 .suggestion-pill {
   border-radius: 999px;
   padding: 3px 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #cfd3d7;
   background: #ffffff;
   cursor: pointer;
-  max-width: 180px;
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 12px;
 }
 
 /* footer */
@@ -141,7 +133,7 @@ html, body {
   line-height: 1.3;
 }
 
-/* inputs */
+/* input */
 #input {
   flex: 1;
   min-height: 48px;
@@ -168,17 +160,9 @@ html, body {
 }
 
 /* messages */
-.msg-row {
-  display: flex;
-}
-
-.msg-user {
-  justify-content: flex-end;
-}
-
-.msg-bot {
-  justify-content: flex-start;
-}
+.msg-row { display: flex; }
+.msg-user { justify-content: flex-end; }
+.msg-bot { justify-content: flex-start; }
 
 .bubble {
   max-width: 85%;
@@ -187,13 +171,11 @@ html, body {
   font-size: 16px;
   line-height: 1.5;
 }
-
 .bubble-user {
   background: #1f2937;
   color: white;
   border-bottom-right-radius: 4px;
 }
-
 .bubble-bot {
   background: #f5f5f5;
   color: #111;
@@ -236,7 +218,6 @@ html, body {
 <script>
 const API_BASE = "https://agentkyle-secure-backend.onrender.com";
 
-/* DRAMATICALLY SIMPLIFIED + CORRECT mobile stable height */
 function adjustHeights() {
   const vv = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
@@ -249,7 +230,6 @@ function adjustHeights() {
 
   const extra = 20;
   let available = vv - headerH - inputH - footerH - suggH - extra + 40;
-
   if (available < 140) available = 140;
 
   chatBody.style.height = available + "px";
@@ -259,11 +239,9 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener("resize", adjustHeights);
   window.visualViewport.addEventListener("scroll", adjustHeights);
 }
-
 window.addEventListener("orientationchange", adjustHeights);
 window.addEventListener("load", adjustHeights);
 
-/* chat logic */
 const chatBodyEl = document.getElementById("chatBody");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
@@ -289,7 +267,6 @@ function addMsg(type, text) {
   });
 }
 
-/* suggestions UI */
 function hideSuggestions() {
   suggestionsEl.style.display = "none";
   suggestionsEl.innerHTML = "";
@@ -297,13 +274,9 @@ function hideSuggestions() {
 
 function showSuggestions(list) {
   const unique = Array.from(new Set(list.filter(Boolean)));
-  if (unique.length === 0) {
-    hideSuggestions();
-    return;
-  }
+  if (unique.length === 0) { hideSuggestions(); return; }
 
   suggestionsEl.innerHTML = "";
-
   const label = document.createElement("span");
   label.className = "suggestion-label";
   label.textContent = "Try:";
@@ -314,12 +287,13 @@ function showSuggestions(list) {
     pill.type = "button";
     pill.className = "suggestion-pill";
     pill.textContent = q;
+
     pill.addEventListener("click", () => {
-      input.value = q;
       hideSuggestions();
-      // trigger suggestion as a real query
-      setTimeout(() => send(), 40);
+      input.value = q;
+      send();
     });
+
     suggestionsEl.appendChild(pill);
   });
 
@@ -327,9 +301,8 @@ function showSuggestions(list) {
   adjustHeights();
 }
 
-async function fetchSuggestions(queryText) {
-  const q = queryText ? queryText.trim() : "";
-  if (q.length < 2) {
+async function fetchSuggestions(text) {
+  if (!text || text.trim().length < 2) {
     hideSuggestions();
     return;
   }
@@ -338,12 +311,11 @@ async function fetchSuggestions(queryText) {
     const res = await fetch(API_BASE + "/suggest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q })
+      body: JSON.stringify({ q: text.trim() })
     });
-    if (!res.ok) {
-      hideSuggestions();
-      return;
-    }
+
+    if (!res.ok) { hideSuggestions(); return; }
+
     const data = await res.json();
     showSuggestions(data.suggestions || []);
   } catch {
@@ -365,22 +337,19 @@ async function send() {
     const res = await fetch(API_BASE + "/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q: q,
-        lastBotMessage: lastBotText
-      })
+      body: JSON.stringify({ q, lastBotMessage: lastBotText })
     });
 
     if (!res.ok) {
-      addMsg("bot", "Agent K had trouble reaching the server. Please try again in a moment.");
+      addMsg("bot", "Agent K had trouble reaching the server. Try again.");
       sendBtn.disabled = false;
       return;
     }
 
     const data = await res.json();
-    addMsg("bot", data.answer || "Agent K was not able to form a clear answer. Try asking in a different way.");
+    addMsg("bot", data.answer || "Agent K did not return a clear answer.");
   } catch {
-    addMsg("bot", "There was a network issue. Please try again.");
+    addMsg("bot", "Network issue. Try again.");
   }
 
   sendBtn.disabled = false;
@@ -403,23 +372,11 @@ input.addEventListener("input", () => {
   adjustHeights();
 
   if (suggestTimer) clearTimeout(suggestTimer);
-  const text = input.value;
-  suggestTimer = setTimeout(() => fetchSuggestions(text), 220);
+  suggestTimer = setTimeout(() => fetchSuggestions(input.value), 200);
 });
 
-/* hide suggestions when clicking outside */
 document.addEventListener("click", (e) => {
-  if (!suggestionsEl.contains(e.target) && e.target !== input) {
-    hideSuggestions();
-  }
-});
-
-/* prevent double-tap zoom */
-let lastTouchEnd = 0;
-document.addEventListener("touchend", (e) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) e.preventDefault();
-  lastTouchEnd = now;
+  if (!suggestionsEl.contains(e.target) && e.target !== input) hideSuggestions();
 });
 
 /* initial greeting */
@@ -428,7 +385,6 @@ addMsg(
   "Hi, I am Agent K. Give me a few seconds to wake up. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
 );
 
-/* run once on load */
 adjustHeights();
 </script>
 </body>
