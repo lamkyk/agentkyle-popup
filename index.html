@@ -44,11 +44,18 @@ html, body {
 /* CHAT MOBILE LAYOUT — centered column */
 .chat-inner {
   width: 100%;
-  max-width: 760px;      /* Chat mobile column width */
+  max-width: 650px;   /* mobile default */
   margin: 0 auto;
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* Desktop/tablet wider layout */
+@media (min-width: 768px) {
+  .chat-inner {
+    max-width: 880px;  /* desktop width */
+  }
 }
 
 /* ONLY scroll area */
