@@ -10,66 +10,67 @@
 <style>
   * {
     box-sizing: border-box;
-    font-family: 'Lato', sans-serif;
+    margin: 0;
+    padding: 0;
   }
 
   html, body {
-    margin: 0;
-    padding: 0;
     height: 100%;
     width: 100%;
-    background: transparent;
     overflow: hidden;
+    font-family: 'Lato', sans-serif;
+    background: transparent;
   }
 
   .wrapper {
-    min-height: 100vh;
-    min-height: 100dvh;
-    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     background: transparent;
   }
 
   .header {
+    flex-shrink: 0;
     padding: 18px 20px;
     font-size: 18px;
     font-weight: 700;
     color: #111;
-    background: transparent;
+    background: white;
     border-bottom: 1px solid #e5e5e5;
-    flex-shrink: 0;
   }
 
   #chatBody {
     flex: 1;
-    padding: 20px;
     overflow-y: auto;
     overflow-x: hidden;
-    background: transparent;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     -webkit-overflow-scrolling: touch;
+    background: transparent;
   }
 
   .msg-row {
     display: flex;
-    animation: fadeIn 0.2s ease-out;
     width: 100%;
+    animation: fadeIn 0.2s ease-out;
   }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .msg-user { justify-content: flex-end; }
-  .msg-bot  { justify-content: flex-start; }
+  .msg-bot { justify-content: flex-start; }
 
   .bubble {
-    max-width: 100%;
-    width: 100%;
+    max-width: 85%;
     padding: 14px 16px;
     border-radius: 12px;
     font-size: 15px;
@@ -92,13 +93,13 @@
   }
 
   #inputBar {
-    background: rgba(255, 255, 255, 0.95);
+    flex-shrink: 0;
     padding: 16px 20px;
+    background: white;
     border-top: 1px solid #e5e5e5;
     display: flex;
     gap: 12px;
     align-items: flex-end;
-    flex-shrink: 0;
   }
 
   #input {
@@ -109,6 +110,7 @@
     border-radius: 12px;
     border: 1.5px solid #d1d5db;
     font-size: 15px;
+    font-family: 'Lato', sans-serif;
     resize: none;
     outline: none;
     background: white;
@@ -144,12 +146,6 @@
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
-    .wrapper {
-      height: auto;
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
-
     .header {
       padding: 16px;
       font-size: 17px;
@@ -158,19 +154,16 @@
     #chatBody {
       padding: 16px;
       gap: 14px;
-      padding-bottom: 20px;
     }
 
     .bubble {
       padding: 13px 15px;
       font-size: 15px;
+      max-width: 90%;
     }
 
     #inputBar {
       padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.98);
-      position: sticky;
-      bottom: 0;
     }
 
     #input {
@@ -220,7 +213,6 @@
 
 <body>
 <div class="wrapper">
-
   <div class="header">You're chatting with Agent K…</div>
 
   <div id="chatBody"></div>
@@ -232,8 +224,6 @@
 </div>
 
 <script>
-const RESUME_URL = "https://drive.google.com/file/d/1u34EYqM1fC5Y68GKTxpKAtmR0xR0Qk7z/view?usp=sharing";
-
 const chatBody = document.getElementById("chatBody");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
@@ -248,7 +238,11 @@ function addMsg(type, text) {
 
   row.appendChild(bubble);
   chatBody.appendChild(row);
-  chatBody.scrollTop = chatBody.scrollHeight;
+  
+  // Auto-scroll to bottom
+  setTimeout(() => {
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }, 100);
 }
 
 async function send() {
@@ -264,10 +258,7 @@ async function send() {
     const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        q,
-        resume: RESUME_URL
-      })
+      body: JSON.stringify({ q })
     });
 
     if (!res.ok) {
@@ -301,7 +292,7 @@ input.addEventListener("input", () => {
   input.style.height = Math.min(input.scrollHeight, 120) + "px";
 });
 
-// Prevent double-tap zoom on mobile
+// Prevent double-tap zoom
 let lastTouchEnd = 0;
 document.addEventListener('touchend', e => {
   const now = Date.now();
@@ -311,9 +302,8 @@ document.addEventListener('touchend', e => {
   lastTouchEnd = now;
 }, false);
 
-addMsg("bot",
-  "Hi, I'm Agent K. Please give me a few seconds to wake-up. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
-);
+// Initial greeting
+addMsg("bot", "Hi, I'm Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?");
 </script>
 
 </body>
