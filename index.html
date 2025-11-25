@@ -304,6 +304,17 @@ document.addEventListener('touchend', e => {
 
 // Initial greeting
 addMsg("bot", "Hi, I'm Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?");
+ 
+ // GOOGLE SITES AUTO-RESIZE FIX
+function sendResizeToParent() {
+  const height = document.documentElement.scrollHeight;
+  parent.postMessage(height, "*");  // Google Sites listens for raw height numbers
+}
+
+// Continually update iframe height (required for mobile)
+window.onload = sendResizeToParent;
+setInterval(sendResizeToParent, 300);
+
 </script>
 
 </body>
