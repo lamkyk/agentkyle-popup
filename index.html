@@ -4,7 +4,9 @@
 <meta charset="UTF-8" />
 <title>Agent K Chat</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
 <style>
 * {
   box-sizing: border-box;
@@ -57,15 +59,15 @@ html, body {
 
 @media (min-width: 768px) {
   .chat-inner {
-    max-width: 980px; /* wider desktop */
+    max-width: 980px;
   }
 }
 
-/* main scroll area – height set dynamically via JS */
+/* main scroll area – height controlled by JS */
 #chatBody {
   overflow-y: auto;
   padding: 16px 20px;
-  padding-bottom: 24px;
+  padding-bottom: 32px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -78,24 +80,7 @@ html, body {
   display: block;
 }
 
-#chatBody::-webkit-scrollbar {
-  width: 8px;
-}
-
-#chatBody::-webkit-scrollbar-track {
-  background: white;
-}
-
-#chatBody::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-#chatBody {
-  scrollbar-color: #ccc white;
-}
-
-/* input bar – “floating” above bottom */
+/* input bar – floating above bottom */
 #inputBar {
   padding: 14px 20px;
   background: #fff;
@@ -104,22 +89,25 @@ html, body {
   gap: 10px;
   align-items: flex-end;
   flex-shrink: 0;
-  z-index: 20;
+  z-index: 30;
 
-  /* lift whole input area above browser chrome */
-  margin-top: 4px;
-  margin-bottom: 0;
+  /* FLOAT LIFT — MEDIUM (40px) */
+  margin-bottom: calc(40px + env(safe-area-inset-bottom));
 }
 
-/* footer sits below input bar; group floats above bottom */
+/* footer */
 .footer-note {
   text-align: center;
   font-size: 9px;
   color: #555;
   opacity: 0.85;
   padding: 6px 0;
-  margin-top: 4px;
-  margin-bottom: calc(24px + env(safe-area-inset-bottom));
+
+  /* more spacing above footer */
+  margin-top: 12px;
+
+  /* keep footer readable above bottom safe area */
+  margin-bottom: calc(50px + env(safe-area-inset-bottom));
   line-height: 1.3;
 }
 
@@ -183,9 +171,11 @@ html, body {
 }
 </style>
 </head>
+
 <body>
 <div class="wrapper">
   <div class="chat-inner">
+
     <div class="header">You're now chatting with Agent K...</div>
 
     <div id="chatBody"></div>
@@ -206,48 +196,43 @@ html, body {
       Agent K can make mistakes. Feel free to reach out directly.<br>
       2025-2026
     </div>
+
   </div>
 </div>
 
 <script>
-/* stable height using visual viewport */
+/* DRAMATICALLY SIMPLIFIED + CORRECT mobile stable height */
 function adjustHeights() {
   const vv = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
-  const headerEl = document.querySelector('.header');
-  const inputBarEl = document.querySelector('#inputBar');
-  const footerEl = document.querySelector('.footer-note');
-  const chatBodyEl = document.querySelector('#chatBody');
+  const headerH = document.querySelector('.header').offsetHeight;
+  const inputH = document.querySelector('#inputBar').offsetHeight;
+  const footerH = document.querySelector('.footer-note').offsetHeight;
 
-  if (!headerEl || !inputBarEl || !footerEl || !chatBodyEl) return;
+  const chatBody = document.querySelector('#chatBody');
 
-  const headerH = headerEl.offsetHeight;
-  const inputH = inputBarEl.offsetHeight;
-  const footerH = footerEl.offsetHeight;
+  const extra = 20;
+  let available = vv - headerH - inputH - footerH - extra;
 
-  const extraGap = 16; // small safety buffer
-  let available = vv - headerH - inputH - footerH - extraGap;
+  if (available < 140) available = 140;
 
-  if (available < 120) available = 120; // never collapse too small
-
-  chatBodyEl.style.height = available + "px";
+  chatBody.style.height = available + "px";
 }
 
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', adjustHeights);
-  window.visualViewport.addEventListener('scroll', adjustHeights);
+  window.visualViewport.addEventListener("resize", adjustHeights);
+  window.visualViewport.addEventListener("scroll", adjustHeights);
 }
 
-window.addEventListener('orientationchange', adjustHeights);
-window.addEventListener('load', adjustHeights);
+window.addEventListener("orientationchange", adjustHeights);
+window.addEventListener("load", adjustHeights);
 
 /* chat logic */
-const chatBody = document.getElementById("chatBody");
+const chatBodyEl = document.getElementById("chatBody");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
 let lastBotText = "";
 
-/* add message */
 function addMsg(type, text) {
   const row = document.createElement("div");
   row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
@@ -257,16 +242,15 @@ function addMsg(type, text) {
   bubble.textContent = text;
 
   row.appendChild(bubble);
-  chatBody.appendChild(row);
+  chatBodyEl.appendChild(row);
 
   requestAnimationFrame(() => {
-    chatBody.scrollTop = chatBody.scrollHeight;
+    chatBodyEl.scrollTop = chatBodyEl.scrollHeight;
     if (type === "bot") lastBotText = text.trim();
     adjustHeights();
   });
 }
 
-/* send logic */
 async function send() {
   const q = input.value.trim();
   if (!q) return;
@@ -287,14 +271,14 @@ async function send() {
     });
 
     if (!res.ok) {
-      addMsg("bot", "The server is waking up. Please try that again in a moment.");
+      addMsg("bot", "The server is waking up. Please try again in a moment.");
       sendBtn.disabled = false;
       return;
     }
 
     const data = await res.json();
     addMsg("bot", data.answer || "I didn’t get a usable reply. Try again.");
-  } catch (e) {
+  } catch {
     addMsg("bot", "There was a network issue. Please try again.");
   }
 
@@ -314,21 +298,17 @@ input.addEventListener("keydown", (e) => {
 input.addEventListener("input", () => {
   input.style.height = "48px";
   input.style.height = Math.min(input.scrollHeight, 140) + "px";
-  chatBody.scrollTop = chatBody.scrollHeight;
+  chatBodyEl.scrollTop = chatBodyEl.scrollHeight;
   adjustHeights();
 });
 
-/* prevent accidental zoom */
+/* prevent double-tap zoom */
 let lastTouchEnd = 0;
-document.addEventListener(
-  "touchend",
-  (e) => {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) e.preventDefault();
-    lastTouchEnd = now;
-  },
-  false
-);
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) e.preventDefault();
+  lastTouchEnd = now;
+});
 
 /* initial greeting */
 addMsg(
