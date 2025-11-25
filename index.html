@@ -1,194 +1,327 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Agent K Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Agent K Chat</title>
+  <!-- Lato font -->
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      font-family: "Lato", sans-serif;
+      background: transparent;
+      overflow: hidden; /* outer page never scrolls, only chatBody scrolls */
+    }
 
-  html, body {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;   /* IMPORTANT: iframe manages scroll internally */
-    font-family: 'Lato', sans-serif;
-  }
+    .wrapper {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background: transparent;
+    }
 
-  /* ---- MAIN WRAPPER ---- */
-  .wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;       /* FULL SCREEN ALWAYS */
-    width: 100%;
-    background: white;
-  }
+    .header {
+      flex-shrink: 0;
+      padding: 16px 20px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-  /* ---- HEADER ---- */
-  .header {
-    padding: 16px 20px;
-    font-size: 18px;
-    font-weight: 700;
-    border-bottom: 1px solid #eee;
-    flex-shrink: 0;
-  }
+    #chatBody {
+      flex: 1;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      background: transparent;
+      /* keep space so last bubble is not hidden behind input bar */
+      padding-bottom: 96px;
+    }
 
-  /* ---- CHAT CONTAINER ---- */
-  #chatBody {
-    flex: 1;
-    overflow-y: auto;       /* INTERNAL SCROLLING */
-    padding: 16px;
-    -webkit-overflow-scrolling: touch;
-    background: #fafafa;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+    .msg-row {
+      display: flex;
+      width: 100%;
+      animation: fadeIn 0.18s ease-out;
+    }
 
-  .msg-row { display: flex; width: 100%; }
-  .msg-user { justify-content: flex-end; }
-  .msg-bot { justify-content: flex-start; }
+    .msg-user {
+      justify-content: flex-end;
+    }
 
-  .bubble {
-    max-width: 85%;
-    padding: 12px 14px;
-    border-radius: 12px;
-    font-size: 15px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
+    .msg-bot {
+      justify-content: flex-start;
+    }
 
-  .bubble-user {
-    background: #1f2937;
-    color: white;
-    border-bottom-right-radius: 4px;
-  }
-  .bubble-bot {
-    background: #f3f4f6;
-    border-bottom-left-radius: 4px;
-  }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  /* ---- FIXED INPUT BAR ---- */
-  #inputBar {
-    flex-shrink: 0;
-    display: flex;
-    gap: 10px;
-    padding: 14px;
-    border-top: 1px solid #e5e5e5;
-    background: white;
-  }
+    .bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 24px;
+      font-size: 15px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      word-break: break-word;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    }
 
-  #input {
-    flex: 1;
-    min-height: 44px;
-    max-height: 120px;
-    padding: 12px 14px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-size: 15px;
-    resize: none;
-    outline: none;
-    background: #fff;
-  }
+    .bubble-user {
+      background: #111827;
+      color: #ffffff;
+      border-bottom-right-radius: 8px;
+    }
 
-  #sendBtn {
-    padding: 0 18px;
-    border: none;
-    border-radius: 10px;
-    background: #1f2937;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-  }
+    .bubble-bot {
+      background: #f3f4f6;
+      color: #111827;
+      border-bottom-left-radius: 8px;
+    }
 
-  #sendBtn:disabled {
-    background: #aaa;
-    cursor: not-allowed;
-  }
+    #inputBar {
+      flex-shrink: 0;
+      padding: 10px 16px 14px 16px;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
 
-</style>
+    #input {
+      flex: 1;
+      min-height: 44px;
+      max-height: 112px;
+      padding: 11px 14px;
+      border-radius: 18px;
+      border: 1.5px solid #d1d5db;
+      font-size: 15px;
+      font-family: "Lato", sans-serif;
+      resize: none;
+      outline: none;
+      background: #ffffff;
+      line-height: 1.5;
+    }
+
+    #input:focus {
+      border-color: #111827;
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+    }
+
+    #sendBtn {
+      padding: 11px 20px;
+      height: 44px;
+      border-radius: 18px;
+      border: none;
+      background: #111827;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    #sendBtn:hover {
+      background: #020617;
+    }
+
+    #sendBtn:active {
+      background: #000000;
+    }
+
+    #sendBtn:disabled {
+      background: #9ca3af;
+      cursor: default;
+    }
+
+    #chatBody::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chatBody::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+
+    #chatBody::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* Mobile tuning */
+    @media (max-width: 768px) {
+      .header {
+        padding: 14px 16px;
+        font-size: 17px;
+      }
+
+      #chatBody {
+        padding: 12px 14px;
+        padding-bottom: 88px;
+      }
+
+      .bubble {
+        max-width: 88%;
+        font-size: 14.5px;
+        padding: 11px 14px;
+      }
+
+      #inputBar {
+        padding: 8px 10px 12px 10px;
+      }
+
+      #input {
+        font-size: 16px;
+      }
+
+      #sendBtn {
+        font-size: 15px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-<div class="wrapper">
+  <div class="wrapper">
+    <div class="header">You are chatting with Agent K</div>
 
-  <div class="header">You're chatting with Agent K…</div>
+    <div id="chatBody"></div>
 
-  <div id="chatBody"></div>
-
-  <div id="inputBar">
-    <textarea id="input" placeholder="Ask about Kyle's experience..."></textarea>
-    <button id="sendBtn">Send</button>
+    <div id="inputBar">
+      <textarea
+        id="input"
+        placeholder="Ask about Kyle's experience..."
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="sentences"
+        spellcheck="false"
+      ></textarea>
+      <button id="sendBtn">Send</button>
+    </div>
   </div>
 
-</div>
+  <script>
+    const chatBody = document.getElementById("chatBody");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("sendBtn");
 
-<script>
-const chatBody = document.getElementById("chatBody");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("sendBtn");
+    function addMsg(type, text) {
+      const row = document.createElement("div");
+      row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
 
-function addMsg(type, text) {
-  const row = document.createElement("div");
-  row.className = "msg-row " + (type === "user" ? "msg-user" : "msg-bot");
+      const bubble = document.createElement("div");
+      bubble.className =
+        "bubble " + (type === "user" ? "bubble-user" : "bubble-bot");
+      bubble.textContent = text;
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble " + (type === "user" ? "bubble-user" : "bubble-bot");
-  bubble.textContent = text;
+      row.appendChild(bubble);
+      chatBody.appendChild(row);
 
-  row.appendChild(bubble);
-  chatBody.appendChild(row);
+      // Scroll to bottom after layout
+      requestAnimationFrame(() => {
+        chatBody.scrollTop = chatBody.scrollHeight;
+      });
+    }
 
-  setTimeout(() => chatBody.scrollTop = chatBody.scrollHeight, 50);
-}
+    async function send() {
+      const q = input.value.trim();
+      if (!q) return;
 
-async function send() {
-  const q = input.value.trim();
-  if (!q) return;
+      addMsg("user", q);
+      input.value = "";
+      input.style.height = "44px";
+      sendBtn.disabled = true;
 
-  addMsg("user", q);
-  input.value = "";
-  input.style.height = "44px";
-  sendBtn.disabled = true;
+      try {
+        const res = await fetch(
+          "https://agentkyle-secure-backend.onrender.com/query",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ q })
+          }
+        );
 
-  try {
-    const res = await fetch("https://agentkyle-secure-backend.onrender.com/query", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q })
+        if (!res.ok) {
+          addMsg(
+            "bot",
+            "The backend is waking up. Please try that again in a moment."
+          );
+          sendBtn.disabled = false;
+          return;
+        }
+
+        const data = await res.json();
+        addMsg("bot", data.answer || "I did not get a usable reply. Please try again.");
+      } catch (e) {
+        addMsg("bot", "There was a network issue. Please try again.");
+      }
+
+      sendBtn.disabled = false;
+      input.focus();
+    }
+
+    sendBtn.addEventListener("click", send);
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
     });
 
-    const data = await res.json();
-    addMsg("bot", data.answer || "Backend issue — try again in a moment.");
-  } catch (e) {
-    addMsg("bot", "Network error. Try again.");
-  }
+    input.addEventListener("input", () => {
+      // auto grow textarea
+      input.style.height = "44px";
+      input.style.height = Math.min(input.scrollHeight, 112) + "px";
+    });
 
-  sendBtn.disabled = false;
-  input.focus();
-}
+    // Prevent accidental double tap zoom on iOS
+    let lastTouchEnd = 0;
+    document.addEventListener(
+      "touchend",
+      (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          e.preventDefault();
+        }
+        lastTouchEnd = now;
+      },
+      false
+    );
 
-sendBtn.onclick = send;
-
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    send();
-  }
-});
-
-input.addEventListener("input", () => {
-  input.style.height = "44px";
-  input.style.height = Math.min(input.scrollHeight, 120) + "px";
-});
-
-addMsg("bot", "Hi, I'm Agent K. Ask me anything about Kyle’s experience.");
-</script>
-
+    // Initial greeting
+    addMsg(
+      "bot",
+      "Hi, I am Agent K. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
+    );
+  </script>
 </body>
 </html>
