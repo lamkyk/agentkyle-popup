@@ -180,6 +180,11 @@ html, body {
   background: #f5f5f5;
   color: #111;
   border-bottom-left-radius: 4px;
+  white-space: normal;
+}
+.bubble-bot ul {
+  padding-left: 20px;
+  margin: 6px 0;
 }
 </style>
 </head>
@@ -218,6 +223,28 @@ html, body {
 <script>
 const API_BASE = "https://agentkyle-secure-backend.onrender.com";
 
+/* NEW: HTML CONVERSION FOR MULTI-PARAGRAPH OUTPUT */
+function convertToHTML(raw) {
+  if (!raw) return "";
+
+  let html = raw
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Bullet points
+  html = html.replace(/^\s*\*\s+(.*)$/gm, "<li>$1</li>");
+  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
+
+  // Paragraph breaks
+  html = html.replace(/\n{2,}/g, "<br><br>");
+
+  // Line breaks
+  html = html.replace(/\n/g, "<br>");
+
+  return html;
+}
+
 function adjustHeights() {
   const vv = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
@@ -255,7 +282,7 @@ function addMsg(type, text) {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble " + (type === "user" ? "bubble-user" : "bubble-bot");
-  bubble.textContent = text;
+  bubble.innerHTML = convertToHTML(text);
 
   row.appendChild(bubble);
   chatBodyEl.appendChild(row);
@@ -280,7 +307,7 @@ function showSuggestions(list) {
   list.forEach(x => {
     if (!x) return;
     const key = x.toLowerCase().trim();
-    if (seen.has(key)) return;     // remove periods, duplicates, variants
+    if (seen.has(key)) return;
     seen.add(key);
     unique.push(x);
   });
