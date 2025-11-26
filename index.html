@@ -227,20 +227,38 @@ const API_BASE = "https://agentkyle-secure-backend.onrender.com";
 function convertToHTML(raw) {
   if (!raw) return "";
 
-  let html = raw
+  let text = raw
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  // Bullet points
-  html = html.replace(/^\s*\*\s+(.*)$/gm, "<li>$1</li>");
-  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
+  const lines = text.split(/\n+/);
+  let html = "";
+  let inList = false;
 
-  // Paragraph breaks
-  html = html.replace(/\n{2,}/g, "<br><br>");
+  for (let line of lines) {
+    const trimmed = line.trim();
 
-  // Line breaks
-  html = html.replace(/\n/g, "<br>");
+    if (/^\*\s+/.test(trimmed)) {
+      // bullet
+      if (!inList) {
+        html += "<ul>";
+        inList = true;
+      }
+      html += "<li>" + trimmed.replace(/^\*\s+/, "") + "</li>";
+    } else {
+      // close list if switching back to normal text
+      if (inList) {
+        html += "</ul>";
+        inList = false;
+      }
+      if (trimmed.length > 0) {
+        html += "<p>" + trimmed + "</p>";
+      }
+    }
+  }
+
+  if (inList) html += "</ul>";
 
   return html;
 }
