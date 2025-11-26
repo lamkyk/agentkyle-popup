@@ -414,7 +414,7 @@ async function send() {
     }
 
     const data = await res.json();
-    addMsg("bot", data.answer || "Agent K did not return a clear answer.");
+    addMsg("bot", data.answer || "Agent K did not return a clear answer. Can you try rephrasing the question? 😅");
   } catch {
     addMsg("bot", "Network issue. Try again.");
   }
