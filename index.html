@@ -272,9 +272,23 @@ function hideSuggestions() {
   suggestionsEl.innerHTML = "";
 }
 
+/* UPDATED SUGGESTION RENDERING + DEDUPE */
 function showSuggestions(list) {
-  const unique = Array.from(new Set(list.filter(Boolean)));
-  if (unique.length === 0) { hideSuggestions(); return; }
+  const unique = [];
+  const seen = new Set();
+
+  list.forEach(x => {
+    if (!x) return;
+    const key = x.toLowerCase().trim();
+    if (seen.has(key)) return;     // remove periods, duplicates, variants
+    seen.add(key);
+    unique.push(x);
+  });
+
+  if (unique.length === 0) {
+    hideSuggestions();
+    return;
+  }
 
   suggestionsEl.innerHTML = "";
   const label = document.createElement("span");
@@ -301,8 +315,11 @@ function showSuggestions(list) {
   adjustHeights();
 }
 
+/* UPDATED FETCH */
 async function fetchSuggestions(text) {
-  if (!text || text.trim().length < 2) {
+  const cleaned = text.trim();
+
+  if (cleaned.length < 2) {
     hideSuggestions();
     return;
   }
@@ -311,13 +328,18 @@ async function fetchSuggestions(text) {
     const res = await fetch(API_BASE + "/suggest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q: text.trim() })
+      body: JSON.stringify({ q: cleaned })
     });
 
-    if (!res.ok) { hideSuggestions(); return; }
+    if (!res.ok) {
+      hideSuggestions();
+      return;
+    }
 
     const data = await res.json();
-    showSuggestions(data.suggestions || []);
+    const suggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+
+    showSuggestions(suggestions);
   } catch {
     hideSuggestions();
   }
@@ -382,10 +404,12 @@ document.addEventListener("click", (e) => {
 /* initial greeting */
 addMsg(
   "bot",
-  "Hi, I am Agent K. Give me a few seconds to wake up. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
+  "Hi, I am Agent K 😎. Give me a few seconds to wake up. I can answer questions about Kyle's professional experience, skills, and background. What would you like to know?"
 );
 
-  fetchSuggestions("experience");  
+/* optional initial refresh of suggestions */
+fetchSuggestions("experience");
+
 adjustHeights();
 </script>
 </body>
