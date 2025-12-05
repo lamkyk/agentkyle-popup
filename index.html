@@ -89,16 +89,16 @@ html, body {
   width: calc(100% - 40px);
   margin-left: auto;
   margin-right: auto;
-  margin-top: -20px;
+  margin-top: -40px;
   background: #f1f3f5;
   border: 1px solid #d9dce0;
   border-radius: 10px;
-  padding: 6px 8px;
-  font-size: 11px;
+  padding: 4px 6px;
+  font-size: 10px;
   color: #4b5563;
   display: none;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 2px;
   z-index: 29;
   position: relative;
 }
@@ -200,11 +200,11 @@ html, body {
     <div id="inputBar">
       <textarea
         id="input"
-        placeholder="Ask about experience, a technical topic, or a time when he..."
+        placeholder="Ask about experience, technical topics, or a time when he..."
         autocomplete="off"
         autocorrect="off"
         autocapitalize="sentences"
-        spellcheck="false"
+        spellcheck=“on”
       ></textarea>
       <button id="sendBtn">Send</button>
     </div>
@@ -212,7 +212,8 @@ html, body {
     <div id="suggestions"></div>
 
     <div class="footer-note">
-      Agent K can make mistakes. Feel free to reach out directly.<br><br>
+<br><br>
+      Agent K can make mistakes. Feel free to reach out directly.<br>
       (Beta)<br>
       ⚙️ 2025-2026
     </div>
