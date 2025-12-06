@@ -400,14 +400,33 @@ body.dark-theme .bubble-bot {
     height: 70px;
     width: 100%;
   }
+ /* ============================================
+   FINAL HARD LOCK: No horizontal scroll ever
+   ============================================ */
+html, body, .wrapper, .chat-inner, #chatBody, #inputBar {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+.bubble, .msg-row {
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+/* Mobile-only top spacing to clear Google Sites nav bar */
+.mobile-spacer {
+  height: 110px;
+  width: 100%;
+}
+@media (max-width: 480px) {
+  #chatBody {
+    padding-top: 30px !important;
+  }
 }
 </style>
 </head>
-
 <body>
-<!-- Spacer so content starts below Google Sites nav on mobile -->
 <div class="mobile-spacer"></div>
-
 <div class="wrapper">
   <div class="chat-inner">
 
