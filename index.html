@@ -104,11 +104,15 @@ body.dark-theme .theme-toggle {
   flex-direction: column;
   flex: 1;
 }
-@media (min-width: 768px) {
+/* Prevent vertical stretch + prevent viewport zooming on mobile */
+@media (max-width: 480px) {
   .chat-inner {
-    max-width: 980px;
+    height: calc(100vh - 110px) !important; /* matches mobile-spacer height */
+    max-height: calc(100vh - 110px) !important;
+    overflow: hidden !important;
   }
 }
+
 
 /* main scroll area */
 #chatBody {
@@ -422,6 +426,24 @@ html, body, .wrapper, .chat-inner, #chatBody, #inputBar {
   #chatBody {
     padding-top: 30px !important;
   }
+  /* FINAL FIX: Prevent Safari from zooming out or expanding width */
+html, body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.wrapper,
+.chat-inner,
+#chatBody,
+#inputBar,
+.header,
+.bubble,
+.msg-row {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  word-wrap: break-word !important;
+}
 }
 </style>
 </head>
