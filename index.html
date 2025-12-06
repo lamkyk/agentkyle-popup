@@ -82,7 +82,7 @@ body.dark-theme .header {
   justify-content: center;
   font-size: 15px;
   cursor: pointer;
-  color: #111; /* ensures moon is visible in light mode */
+  color: #111; /* moon visible in light mode */
 }
 
 /* in dark mode the sun icon should be bright white */
@@ -104,15 +104,12 @@ body.dark-theme .theme-toggle {
   flex-direction: column;
   flex: 1;
 }
-/* Prevent vertical stretch + prevent viewport zooming on mobile */
-@media (max-width: 480px) {
+
+@media (min-width: 768px) {
   .chat-inner {
-    height: calc(100vh - 110px) !important; /* matches mobile-spacer height */
-    max-height: calc(100vh - 110px) !important;
-    overflow: hidden !important;
+    max-width: 980px;
   }
 }
-
 
 /* main scroll area */
 #chatBody {
@@ -123,6 +120,7 @@ body.dark-theme .theme-toggle {
   gap: 14px;
   -webkit-overflow-scrolling: touch;
 }
+
 #chatBody::after {
   content: "";
   height: 1px;
@@ -270,9 +268,11 @@ body.dark-theme #input {
 .msg-row {
   display: flex;
 }
+
 .msg-user {
   justify-content: flex-end;
 }
+
 .msg-bot {
   justify-content: flex-start;
 }
@@ -292,6 +292,7 @@ body.light-theme .bubble-user {
   border: 1px solid #e5e7eb;
   border-bottom-right-radius: 4px;
 }
+
 body.dark-theme .bubble-user {
   background: #111827;
   color: #f9fafb;
@@ -306,6 +307,7 @@ body.light-theme .bubble-bot {
   border: 1px solid #e5e7eb;
   border-bottom-left-radius: 4px;
 }
+
 body.dark-theme .bubble-bot {
   background: transparent;
   color: #e5e7eb;
@@ -319,14 +321,14 @@ body.dark-theme .bubble-bot {
 }
 
 /* =================================================================== */
-/* GOOGLE SITES + MOBILE FIX (<= 480px)                                */
-/* Prevents horizontal scroll, double scroll, and header hiding        */
-/* Ensures placeholder lines are fully visible                         */
+/* GOOGLE SITES + MOBILE FIX (<= 480px)  [OPTION B]                     */
+/* One scroll region, no horizontal scroll, header under Sites nav      */
 /* =================================================================== */
 @media (max-width: 480px) {
 
-  /* Stop sideways scroll on inner document */
-  html, body {
+  /* Base: inner doc never scrolls sideways */
+  html,
+  body {
     width: 100%;
     height: 100%;
     max-width: 100%;
@@ -335,32 +337,38 @@ body.dark-theme .bubble-bot {
   }
 
   .wrapper,
-  .chat-inner {
-    width: 100%;
-    height: 100%;
-    overflow: hidden !important;
-    position: relative;
+  .chat-inner,
+  #chatBody,
+  #inputBar,
+  .header {
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
-  /* ONLY scrollable region is chatBody */
+  /* Push chat header below Google Sites nav bar */
+  .mobile-spacer {
+    height: 110px;
+    width: 100%;
+  }
+
+  /* History scroll only, ChatGPT-style */
   #chatBody {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch;
-    padding-top: 20px !important;     /* keeps first line of text clear */
+    padding-top: 24px !important;   /* keeps first line of history clear */
     padding-bottom: 40px !important;
-    height: calc(100vh - 190px);      /* under header, above input/footer */
   }
 
-  /* Long lines should never create horizontal scroll */
+  /* Long messages must wrap and never widen layout */
   .msg-row,
   .bubble {
-    max-width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    max-width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
   }
 
-  /* Header remains reachable and sized for mobile */
+  /* Header reachable and sized for mobile */
   .header {
     padding: 12px 16px;
     font-size: 18px;
@@ -384,8 +392,8 @@ body.dark-theme .bubble-bot {
   #input {
     min-height: 60px !important;
     line-height: 1.35 !important;
-    padding-top: 14px !important;
-    padding-bottom: 14px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
     font-size: 15px;
   }
 
@@ -398,58 +406,15 @@ body.dark-theme .bubble-bot {
     transform: translateY(-20px);
     font-size: 9px;
   }
-
-  /* Spacer under Google Sites top menu (uses the div below) */
-  .mobile-spacer {
-    height: 70px;
-    width: 100%;
-  }
- /* ============================================
-   FINAL HARD LOCK: No horizontal scroll ever
-   ============================================ */
-html, body, .wrapper, .chat-inner, #chatBody, #inputBar {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-.bubble, .msg-row {
-  max-width: 100% !important;
-  overflow-wrap: break-word !important;
-  word-break: break-word !important;
-}
-/* Mobile-only top spacing to clear Google Sites nav bar */
-.mobile-spacer {
-  height: 110px;
-  width: 100%;
-}
-@media (max-width: 480px) {
-  #chatBody {
-    padding-top: 30px !important;
-  }
-  /* FINAL FIX: Prevent Safari from zooming out or expanding width */
-html, body {
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-
-.wrapper,
-.chat-inner,
-#chatBody,
-#inputBar,
-.header,
-.bubble,
-.msg-row {
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-  box-sizing: border-box !important;
-  word-wrap: break-word !important;
-}
 }
 </style>
 </head>
+
 <body>
-  <div class="wrapper">
-<div class="mobile-spacer"></div>
+<div class="wrapper">
+  <!-- Spacer so header sits below Google Sites nav on mobile -->
+  <div class="mobile-spacer"></div>
+
   <div class="chat-inner">
 
     <div class="header">
