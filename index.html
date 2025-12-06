@@ -317,30 +317,24 @@ body.dark-theme .bubble-bot {
   margin: 6px 0;
 }
 
-/* =============================================================== */
-/* GOOGLE SITES SAFE MOBILE FIX                                   */
-/* Prevents horizontal scroll, double scroll, sticky header issues */
-/* Ensures theme toggle stays clickable                            */
-/* =============================================================== */
+/* =================================================================== */
+/* GOOGLE SITES + MOBILE FIX                                           */
+/* Prevents horizontal scroll, double scroll, header blocking,          */
+/* and ensures textarea placeholder never gets clipped.                */
+/* =================================================================== */
 @media (max-width: 480px) {
 
-  /* Google Sites wrapper tries to scroll body — block it */
+  /* Google Sites wrapper scroll-fight prevention */
   html, body {
     width: 100%;
     height: 100%;
-    overflow: hidden !important;     /* body must NEVER scroll */
+    max-width: 100%;
+    overflow-x: hidden !important;
     overscroll-behavior: none;
-    touch-action: none;              /* stops page from fighting chat scroll */
   }
 
-  /* Main container should not scroll — only #chatBody scrolls */
-  .wrapper {
-    width: 100%;
-    height: 100%;
-    overflow: hidden !important;
-    position: relative;
-  }
-
+  /* Main container – locked layout */
+  .wrapper,
   .chat-inner {
     width: 100%;
     height: 100%;
@@ -348,16 +342,17 @@ body.dark-theme .bubble-bot {
     position: relative;
   }
 
-  /* THE ONLY scrollable region */
+  /* ----- ONLY scrollable region ----- */
   #chatBody {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch;
-    height: calc(100vh - 180px);   /* ensures chat stays below header + above input */
-    padding-bottom: 40px;
+    padding-bottom: 40px !important;
+    padding-top: 20px !important; /* helps first message not get clipped */
+    height: calc(100vh - 175px);  /* safe height under header and above input */
   }
 
-  /* Keep messages from widening container */
+  /* Prevent bubbles from causing horizontal shift */
   .msg-row,
   .bubble {
     max-width: 100%;
@@ -365,48 +360,55 @@ body.dark-theme .bubble-bot {
     word-break: break-word;
   }
 
-  /* header MUST stay sticky + clickable */
+  /* ----- Sticky, reachable header ----- */
   .header {
     position: sticky !important;
     top: 0;
     z-index: 99999;
-    pointer-events: auto !important;     /* REQUIRED on Google Sites */
+    padding: 12px 16px;
+    font-size: 18px;
+    background: inherit;
   }
 
-  /* theme toggle interference fix */
+  /* theme toggle must remain clickable on Google Sites */
   .theme-toggle {
-    pointer-events: auto !important;     /* allow click-through */
+    pointer-events: auto !important;
     position: relative;
     z-index: 100000;
   }
 
-  /* Input bar stays normal but reduced lift */
+  /* ----- Input bar & placeholder fix ----- */
   #inputBar {
-    transform: translateY(-18px);
+    transform: translateY(-18px); /* less upward lift */
     padding: 10px 14px;
   }
 
+  /* Fix placeholder cutting off, two-line support */
+  #input {
+    min-height: 56px !important;       /* ensures wrapped placeholder fits */
+    line-height: 1.35 !important;      /* spacing for two-line placeholder */
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+    font-size: 15px;
+  }
+
+  /* suggestions alignment */
   #suggestions {
     margin-top: -18px;
   }
 
-  /* Footer adjustment */
+  /* footer */
   .footer-note {
     transform: translateY(-18px);
-    
-/* Mobile-only top spacing to clear Google Sites nav bar */
-@media (max-width: 480px) {
+    font-size: 9px;
+  }
+
+  /* OPTIONAL: mobile spacer under Google Sites menu */
   .mobile-spacer {
-    height: 75px;    /* adjust as needed */
+    height: 70px;
     width: 100%;
-    
-@media (max-width: 480px) {
-  #chatBody {
-    padding-top: 20px !important;
   }
 }
-
-
 
 </style>
 </head>
