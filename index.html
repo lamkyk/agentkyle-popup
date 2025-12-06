@@ -82,10 +82,13 @@ body.dark-theme .header {
   justify-content: center;
   font-size: 15px;
   cursor: pointer;
+  color: #111; /* ensures moon is visible in light mode */
 }
 
+/* in dark mode the sun icon should be bright white */
 body.dark-theme .theme-toggle {
   border-color: rgba(148, 163, 184, 0.9);
+  color: #ffffff; /* sun becomes white in dark mode */
 }
 
 .theme-toggle:focus {
@@ -310,6 +313,43 @@ body.dark-theme .bubble-bot {
   padding-left: 20px;
   margin: 6px 0;
 }
+
+  /* ========================= */
+/* MOBILE FIX: prevents prompt box overlap */
+/* ========================= */
+@media (max-width: 480px) {
+  #inputBar {
+    padding: 10px 14px;
+    transform: translateY(-20px); /* was -40px */
+  }
+
+  #input {
+    font-size: 15px;
+    padding: 10px;
+    line-height: 1.2;
+  }
+
+  .header {
+    padding: 12px 16px;
+    font-size: 18px;
+  }
+
+  .footer-note {
+    transform: translateY(-20px); /* match inputBar lift reduction */
+    font-size: 9px;
+  }
+
+  #suggestions {
+    margin-top: -20px;
+  }
+
+  #chatBody {
+    padding-bottom: 20px !important;
+  }
+}
+</style>
+
+  
 </style>
 </head>
 
