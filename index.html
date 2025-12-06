@@ -317,69 +317,82 @@ body.dark-theme .bubble-bot {
   margin: 6px 0;
 }
 
-/* ========================================================= */
-/* FINAL MOBILE FIX: prevents horizontal scroll permanently  */
-/* keeps header reachable, suppresses flex overflow,         */
-/* and stabilizes Google Sites iframe behavior               */
-/* ========================================================= */
+/* =============================================================== */
+/* GOOGLE SITES SAFE MOBILE FIX                                   */
+/* Prevents horizontal scroll, double scroll, sticky header issues */
+/* Ensures theme toggle stays clickable                            */
+/* =============================================================== */
 @media (max-width: 480px) {
 
-  /* Prevent sideways scroll at the root */
+  /* Google Sites wrapper tries to scroll body — block it */
   html, body {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    overscroll-behavior-x: none;
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;     /* body must NEVER scroll */
+    overscroll-behavior: none;
+    touch-action: none;              /* stops page from fighting chat scroll */
+  }
+
+  /* Main container should not scroll — only #chatBody scrolls */
+  .wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;
     position: relative;
   }
 
-  /* Ensure the wrapper never expands wider than viewport */
-  .wrapper, .chat-inner {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
+  .chat-inner {
+    width: 100%;
+    height: 100%;
+    overflow: hidden !important;
+    position: relative;
   }
 
-  /* Fix message rows causing horizontal expansion */
-  .msg-row {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  /* Fix message bubble width (most common cause of overflow) */
-  .bubble {
-    max-width: calc(100% - 12px) !important;
-    overflow-wrap: break-word !important;
-    word-break: break-word !important;
-  }
-
-  /* Prevent long bot/user messages from widening flex container */
-  .bubble-user, .bubble-bot {
-    max-width: calc(100% - 16px) !important;
-  }
-
-  /* Stabilizes input bar width when keyboard opens */
-  #inputBar, #input {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  /* Suggestions sometimes created a 1–2px overflow */
-  #suggestions, .suggestion-pill {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  /* KEEP HEADER ALWAYS REACHABLE */
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 9999; /* ensures theme toggle is always tappable */
-    background: inherit;
-  }
-
-  /* REQUIRED FOR GOOGLE SITES EMBEDS */
+  /* THE ONLY scrollable region */
   #chatBody {
-    overscroll-behavior: contain;
-    padding-bottom: 32px !important; /* prevents locking at bottom */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100vh - 180px);   /* ensures chat stays below header + above input */
+    padding-bottom: 40px;
+  }
+
+  /* Keep messages from widening container */
+  .msg-row,
+  .bubble {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* header MUST stay sticky + clickable */
+  .header {
+    position: sticky !important;
+    top: 0;
+    z-index: 99999;
+    pointer-events: auto !important;     /* REQUIRED on Google Sites */
+  }
+
+  /* theme toggle interference fix */
+  .theme-toggle {
+    pointer-events: auto !important;     /* allow click-through */
+    position: relative;
+    z-index: 100000;
+  }
+
+  /* Input bar stays normal but reduced lift */
+  #inputBar {
+    transform: translateY(-18px);
+    padding: 10px 14px;
+  }
+
+  #suggestions {
+    margin-top: -18px;
+  }
+
+  /* Footer adjustment */
+  .footer-note {
+    transform: translateY(-18px);
   }
 }
 
