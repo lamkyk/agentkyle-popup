@@ -314,41 +314,63 @@ body.dark-theme .bubble-bot {
   margin: 6px 0;
 }
 
-  /* ========================= */
-/* MOBILE FIX: prevents prompt box overlap */
+/* ========================= */
+/* MOBILE FIX: prevents overlap + removes side scroll + keeps header accessible */
 /* ========================= */
 @media (max-width: 480px) {
+
+  /* Stop sideways scrolling / double scrollbars */
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+
+  .wrapper,
+  .chat-inner,
+  #chatBody,
+  #inputBar,
+  #suggestions {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Input bar adjustments */
   #inputBar {
     padding: 10px 14px;
-    transform: translateY(-20px); /* was -40px */
+    transform: translateY(-20px); /* previously -40px */
   }
 
   #input {
     font-size: 15px;
     padding: 10px;
-    line-height: 1.2;
+    line-height: 1.25;
   }
 
+  /* Header stays reachable */
   .header {
     padding: 12px 16px;
     font-size: 18px;
+    position: relative;
+    z-index: 50; /* ensures theme toggle accessible */
   }
 
+  /* Footer spacing */
   .footer-note {
-    transform: translateY(-20px); /* match inputBar lift reduction */
+    transform: translateY(-20px);
     font-size: 9px;
   }
 
+  /* Suggestions container spacing */
   #suggestions {
     margin-top: -20px;
   }
 
+  /* Ensure enough scrollable space above input */
   #chatBody {
-    padding-bottom: 20px !important;
+    padding-bottom: 24px !important;
   }
 }
-</style>
-
   
 </style>
 </head>
