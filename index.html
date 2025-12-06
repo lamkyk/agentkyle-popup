@@ -393,14 +393,22 @@ body.dark-theme .bubble-bot {
   /* Footer adjustment */
   .footer-note {
     transform: translateY(-18px);
+    
+/* Mobile-only top spacing to clear Google Sites nav bar */
+@media (max-width: 480px) {
+  .mobile-spacer {
+    height: 55px;    /* adjust as needed */
+    width: 100%;
   }
 }
+
 
 </style>
 </head>
 
 <body>
 <div class="wrapper">
+  <div class="mobile-spacer"></div>
   <div class="chat-inner">
 
     <div class="header">
