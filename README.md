@@ -54,7 +54,7 @@ If you like people who ship real things that solve real problems (even when they
   <strong>Is it worth it?</strong>
 </p>
 
-<p align="center">
+<p><
   <i>
     “Oh yeah, it’s worth it…<br>
     if you’re strong enough.”
