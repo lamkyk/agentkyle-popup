@@ -46,7 +46,7 @@ It took way longer than I expected and is still a work in progress… but it wor
 
 If you like people who ship real things that solve real problems (even when they’re messy and take forever), let’s talk.
 
-— Kyle  
+Kyle  
 (Feel free to chat with Agent K first — it’s better at this than I am)
 <br>
 <br>
@@ -56,7 +56,7 @@ If you like people who ship real things that solve real problems (even when they
 — <strong>Agent K</strong> (Men in Black)</p>
 
 <p><em>“Is it worth it?”</em><br>
-<strong>“Oh yeah, it’s worth it… if you’re strong enough.”</strong><br>
+“Oh yeah, it’s worth it… if you’re strong enough.”<br>
 — <strong>Agent K</strong> (Men in Black)</p>
 
 <p><em>“more data beats clever algorithms”</em><br>
