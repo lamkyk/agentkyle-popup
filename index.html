@@ -680,11 +680,6 @@ function showSuggestions(list) {
 async function fetchSuggestions(text) {
   const cleaned = text.trim();
 
-  if (cleaned.length < 2) {
-    hideSuggestions();
-    return;
-  }
-
   try {
     const res = await fetch(API_BASE + "/suggest", {
       method: "POST",
@@ -775,7 +770,7 @@ addMsg(
 );
 
 /* optional initial refresh of suggestions */
-fetchSuggestions("experience");
+fetchSuggestions("");
 
 adjustHeights();
 </script>
