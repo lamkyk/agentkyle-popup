@@ -50,15 +50,17 @@ If you like people who ship real things that solve real problems (even when they
 (Feel free to chat with Agent K first — it’s better at this than I am)
 <br>
 <br>
-<p>"Fifteen hundred years ago everybody knew the Earth was the center of the universe. Five hundred years ago, everybody knew the Earth was flat, and fifteen minutes ago, you knew that humans were alone on this planet. Imagine what you'll know tomorrow." -Agent K in Men in Black</p>
-<i> <p> Is it worth it?
-    “Oh yeah, it’s worth it…
-    if you’re strong enough.”
-  
-  —Agent K (MiB)
-</p>
-<p>"more data beats clever algorithms," -Peter Norvig</p>
-</p>
-<p>
-"building AI for robotics and physical interaction is a fundamentally harder challenge than developing large language models (LLMs)." -Fei-Fei Li 
-</p>p><i>
+<p><em>
+    “Fifteen hundred years ago everybody knew the Earth was the center of the universe. Five hundred years ago, everybody knew the Earth was flat, and fifteen minutes ago, you knew that humans were alone on this planet. Imagine what you'll know tomorrow.”
+</em><br>
+— <strong>Agent K</strong> (Men in Black)</p>
+
+<p><em>“Is it worth it?”</em><br>
+<strong>“Oh yeah, it’s worth it… if you’re strong enough.”</strong><br>
+— <strong>Agent K</strong> (Men in Black)</p>
+
+<p><em>“more data beats clever algorithms”</em><br>
+— <strong>Peter Norvig</strong></p>
+
+<p><em>“building AI for robotics and physical interaction is a fundamentally harder challenge than developing large language models (LLMs).”</em><br>
+— <strong>Fei-Fei Li</strong></p>
