@@ -50,9 +50,15 @@ If you like people who ship real things that solve real problems (even when they
 (Feel free to chat with Agent K first — it’s better at this than I am)
 <br>
 <br>
-<p> <i> Is it worth it?
+<p>"Fifteen hundred years ago everybody knew the Earth was the center of the universe. Five hundred years ago, everybody knew the Earth was flat, and fifteen minutes ago, you knew that humans were alone on this planet. Imagine what you'll know tomorrow." -Agent K in Men in Black</p>
+<i> <p> Is it worth it?
     “Oh yeah, it’s worth it…
     if you’re strong enough.”
-  </i>
-  <sub>—Agent K in Men in Black </sub>
+  
+  —Agent K (MiB)
 </p>
+<p>"more data beats clever algorithms," -Peter Norvig</p>
+</p>
+<p>
+"building AI for robotics and physical interaction is a fundamentally harder challenge than developing large language models (LLMs)." -Fei-Fei Li 
+</p>p><i>
