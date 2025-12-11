@@ -713,6 +713,10 @@ async function send() {
   input.style.height = "48px";
   sendBtn.disabled = true;
 
+  // THINKING BUBBLE (added)
+  addMsg("bot", "Thinking…");
+  let thinkingIndex = chatBodyEl.children.length - 1;
+
   try {
     const res = await fetch(API_BASE + "/query", {
       method: "POST",
@@ -721,24 +725,33 @@ async function send() {
     });
 
     if (!res.ok) {
-      addMsg("bot", "Agent K had trouble reaching the server. Try again.");
+      chatBodyEl.children[thinkingIndex]
+        .querySelector(".bubble-bot").innerHTML =
+        convertToHTML("Agent K had trouble reaching the server. Try again.");
       sendBtn.disabled = false;
       return;
     }
 
     const data = await res.json();
-    addMsg(
-      "bot",
-      data.answer ||
-        "Agent K did not return a clear answer. Can you try rephrasing the question? 😅"
-    );
+
+    // REPLACE thinking… with real answer (added)
+    chatBodyEl.children[thinkingIndex]
+      .querySelector(".bubble-bot").innerHTML =
+      convertToHTML(
+        data.answer ||
+          "Agent K did not return a clear answer. Can you try rephrasing the question? 😅"
+      );
+
   } catch {
-    addMsg("bot", "Network issue. Try again.");
+    chatBodyEl.children[thinkingIndex]
+      .querySelector(".bubble-bot").innerHTML =
+      convertToHTML("Network issue. Try again.");
   }
 
   sendBtn.disabled = false;
   input.focus();
 }
+
 
 sendBtn.addEventListener("click", send);
 
