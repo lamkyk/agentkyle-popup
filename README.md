@@ -6,7 +6,7 @@
 An always-on AI that can answer any question about my professional experience — accurately, professionally, and in full third-person voice.
 
 What it doesn't tell:
-- It's my first coding project; took hundreds of hours, dozens of failed versions, countless redeploys, and way too many late-night debugging sessions. 
+- Not as easy as it may appear; not a simple wrapper, took hundreds of hours, dozens of failed versions, countless redeploys, and way too many late-night debugging sessions. 
 - Rebuilt from scratch at least 4 times.
 - I’ve broken production at 2 a.m. 
 - Watched the bot say “I’m Kyle” 47 different ways 
