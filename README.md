@@ -22,6 +22,9 @@ What it doesn't tell:
 - It only looks effortless because of a ridiculous amount of work to make it that way
 
 It handles:
+- Context and behavior logic in a deterministic orchestration layer
+- Latency-optimized, hybrid RAG (Retrieval-Augmented Generation) pipeline
+- JSON KB that functions as semantic ground truth
 - Behavioral / STAR questions with proper structure
 - Deep dives into autonomous systems validation, perception testing, escalations, and large-scale data programs
 - My enterprise SaaS customer success, technical program management, and operations background
